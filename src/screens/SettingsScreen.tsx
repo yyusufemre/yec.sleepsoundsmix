@@ -1,0 +1,210 @@
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/FontAwesome6';
+import LinearGradient from 'react-native-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
+import HeaderComponent from '../components/HeaderComponent';
+import { colors } from '../theme/colors';
+
+const pkg = require('../../package.json');
+
+const SettingsCard = ({ title, description, iconName, children, noBackground }: any) => {
+  const content = (
+    <>
+      <View style={styles.cardHeader}>
+        <Icon name={iconName} size={20} color="rgba(255, 255, 255, 0.1)" solid style={styles.cardIcon} />
+        <View style={styles.cardTextContent}>
+          <Text style={styles.cardTitle}>{title}</Text>
+          <Text style={styles.cardDescription}>{description}</Text>
+        </View>
+      </View>
+      {children}
+    </>
+  );
+
+  if (noBackground) {
+    return <View style={[styles.card, { backgroundColor: 'transparent' }]}>{content}</View>;
+  }
+
+  return (
+    <LinearGradient
+      colors={['rgba(141, 165, 208, 0.1)', 'rgba(72, 84, 106, 0.1)']}
+      style={styles.card}
+    >
+      {content}
+    </LinearGradient>
+  );
+};
+
+const SettingsScreen = () => {
+  const handleEmail = () => {
+    Linking.openURL('mailto:info@yusufemre.com');
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <HeaderComponent 
+        title="Deneyimini Özelleştir" 
+        subtitle="Uygulama kullanımı hakkında bilgi alabilir, bize ulaşabilir veya gelişmemize destek olabilirsiniz." 
+      />
+      
+      <View style={styles.mainContent}>
+        <View style={styles.cardsContainer}>
+          {/* Nasıl Kullanılır - No Background */}
+          <SettingsCard 
+            title="Nasıl Kullanılır" 
+            description="SleepMix, doğanın en saf seslerini harmanlayarak size özel bir huzur alanı yaratır. 'Tüm Sesler' sekmesinden dilediğiniz sesleri seçin, 'Mixle' kısmından seviyelerini ayarlayın ve derin uykunun tadını çıkarın."
+            iconName="circle-question"
+            noBackground
+          />
+
+          {/* Geliştiriciye Ulaş */}
+          <TouchableOpacity onPress={handleEmail} activeOpacity={0.8}>
+            <SettingsCard 
+              title="Geliştiriciye Ulaş" 
+              iconName="pen"
+              description=""
+            >
+              <Text style={styles.cardDescription}>
+                Uygulama içerisinde yaşadığınız bir hata varsa lütfen bize bildirin.{' '}
+                <Text style={styles.boldText}>info@yusufemre.com</Text>
+              </Text>
+            </SettingsCard>
+          </TouchableOpacity>
+
+          {/* Bizi Puanla */}
+          <SettingsCard 
+            title="Bizi Puanla" 
+            description="Destek olmak için lütfen uygulamayı değerlendirin."
+            iconName="stars"
+          >
+            <TouchableOpacity style={styles.rateButton} activeOpacity={0.9}>
+              <View style={styles.starsRow}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Icon key={i} name="star" size={16} color="#FFC900" solid />
+                ))}
+              </View>
+              <Text style={styles.rateText}>Puanla!</Text>
+            </TouchableOpacity>
+          </SettingsCard>
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <View style={styles.logoContainer}>
+            <Svg width="56" height="37" viewBox="0 0 56 37" fill="none">
+              <Path 
+                d="M55.2561 23.4191C55.3017 23.337 55.3507 23.256 55.3951 23.1732C55.5891 22.8102 55.7985 22.4413 55.9333 22.0512C55.9594 21.9767 56.0871 21.6758 55.8996 21.7899C55.7447 21.8845 55.621 22.0199 55.5028 22.1558C55.0491 22.6754 54.6942 23.2991 54.3512 23.8932C53.9017 24.6724 53.4439 25.4911 53.2357 26.3749C53.0464 27.1777 53.0577 28.0278 53.0813 28.8466C53.1215 30.2642 53.2871 31.6835 53.3439 33.1029C52.9411 32.8517 52.5792 32.4976 52.3337 32.2221C51.4447 31.2224 50.8131 29.9928 50.2571 28.7863C48.6223 25.2364 47.5843 21.3944 46.7639 17.585C46.2523 15.2115 45.8472 12.8143 45.5615 10.403C45.4799 9.6989 45.4071 8.99187 45.3468 8.28366C46.069 9.93832 46.8213 11.58 47.6216 13.198C48.4815 14.9366 49.3877 16.6746 50.489 18.276C50.9816 18.9919 51.5317 19.774 52.2616 20.2718C52.5271 20.4533 52.8507 20.6088 53.1718 20.4917C53.3634 20.4219 53.474 20.299 53.6077 20.1429C54.3234 19.3076 54.8782 18.2542 55.3306 17.2575C55.3147 17.2929 55.6063 16.6166 55.5075 16.6574C54.6014 17.0328 53.8271 16.272 53.4723 15.8665C52.7951 15.0915 52.2338 14.2142 51.7068 13.3339C50.8048 11.8277 50.0081 10.2593 49.2487 8.67737C47.8836 5.8339 46.6474 2.92835 45.4598 0.00683377C45.4302 -0.0658789 45.0274 0.465574 45.0221 0.46853C44.7926 0.789529 44.5838 1.12472 44.3815 1.46286C44.1556 1.8412 43.935 2.22546 43.7404 2.62094C43.6038 2.89879 43.4204 3.20087 43.3702 3.50886C42.7544 7.30766 43.1105 11.2791 43.6162 15.0684C43.9799 17.7789 44.475 20.4728 45.1226 23.1306C45.5065 24.7067 45.9442 26.2697 46.4386 27.8114C46.9893 29.5282 47.6139 31.2301 48.4017 32.854C48.9583 34.0003 49.5976 35.1885 50.5156 36.0918C51.0757 36.6428 52.1397 37.3947 52.8879 36.7545C53.0653 36.6026 53.231 36.3738 53.3646 36.19C53.7899 35.6059 54.1566 34.9728 54.5032 34.3402C54.819 33.7632 55.1213 33.1674 55.2898 32.5289C55.4341 31.9821 55.456 31.4039 55.4596 30.8417C55.469 29.3426 55.3028 27.8463 55.22 26.3501C55.1804 25.6324 55.152 24.9118 55.1845 24.193C55.1964 23.934 55.2194 23.6751 55.2549 23.4179L55.2561 23.4191Z" 
+                fill="#3B4B65" 
+              />
+              <Path 
+                d="M43.8593 24.5329C43.8658 24.2645 43.8794 23.9955 43.9102 23.7289C43.9232 23.6148 43.2773 23.7342 42.955 24.2982C42.5427 25.02 42.1056 25.7743 41.9051 26.5907C41.7466 27.2357 41.7472 27.9184 41.7567 28.5782C41.7703 29.5353 41.8495 30.4959 41.8856 31.4559C41.5786 31.2384 41.3095 30.9523 41.1149 30.7064C40.3561 29.7499 39.8368 28.5989 39.3754 27.478C39.1803 27.0039 38.9963 26.5251 38.8201 26.0427C39.5002 25.5367 40.1615 25.004 40.8014 24.4466C41.5757 23.772 42.318 23.0621 43.0301 22.3219C43.1093 22.2392 43.1856 22.1529 43.259 22.0636C42.9656 20.8003 42.5161 18.6692 42.1275 16.0154C40.5406 14.2361 39.1696 12.2634 37.9855 10.199C36.8972 8.3014 35.971 6.3151 35.1844 4.27442C35.156 4.20052 34.7343 4.75621 34.7461 4.7367C34.5166 5.0577 34.3078 5.3923 34.1061 5.73103C33.8802 6.10938 33.6596 6.49363 33.465 6.88912C33.3331 7.1575 33.1243 7.47673 33.0947 7.77704C32.8108 10.6897 33.2 13.6975 33.6253 16.5765C33.9636 18.8672 34.396 21.1503 34.9342 23.4061C35.0915 23.8637 35.6983 24.7883 37.9175 23.2873C37.3314 21.2939 36.8641 19.2615 36.4524 17.2374C36.207 16.0302 35.9887 14.8178 35.7989 13.6011C36.5063 14.852 37.2811 16.0645 38.1304 17.2261C39.2654 18.7785 40.5294 20.2629 41.9648 21.5499C40.7742 22.5277 39.5186 23.425 38.2055 24.2326C37.633 24.5855 37.0504 24.9213 36.4566 25.2375C36.1496 25.4019 35.8391 25.5609 35.5262 25.7152C35.5197 25.6921 35.5132 25.6679 35.5067 25.6443C35.5132 25.6679 35.5197 25.6921 35.5262 25.7158C34.9963 25.9783 34.4598 26.2265 33.9181 26.4624C33.7938 26.5156 33.6685 26.5676 33.5437 26.6197C32.5571 23.6568 31.9035 20.5709 31.4085 17.5075C31.3902 17.3952 31.3736 17.2823 31.3559 17.17C31.3653 17.1345 31.3624 17.1197 31.3635 17.0506C31.373 16.6403 31.3044 16.2141 31.2725 15.8056C31.2139 15.053 31.153 14.3011 31.0915 13.5485C30.9643 11.9885 30.8354 10.429 30.7058 8.8695C30.6786 8.54082 30.6621 8.20859 30.623 7.88049C30.6218 7.86926 30.6136 7.68127 30.5704 7.66472C30.442 7.61624 30.1345 8.10868 30.125 8.12228C29.8388 8.5219 29.5827 8.94221 29.3354 9.36608C29.0432 9.8662 28.7162 10.4231 28.5239 10.9764C28.4222 11.2684 28.4228 11.5522 28.4234 11.859C28.424 12.4035 28.4488 12.9473 28.4796 13.4906C28.576 15.2067 28.7499 16.9193 28.9705 18.6236C28.9693 18.6236 28.9687 18.6248 28.9675 18.6248H28.9699L29.2597 20.6815C29.5093 22.3148 29.8086 23.947 30.1777 25.5627C29.7435 25.2446 29.3041 24.939 28.8634 24.6446C27.8118 23.9423 26.7241 23.2926 25.6086 22.692C25.708 22.6737 25.8062 22.6506 25.9026 22.624C26.196 22.5418 26.4816 22.4313 26.759 22.3007C26.7596 22.3007 26.7602 22.3001 26.7614 22.2995C26.8016 22.2806 26.8418 22.261 26.8821 22.2409C27.2659 22.0287 28.3199 21.2318 27.8893 19.0487C27.2458 19.2059 26.5733 19.1817 26.0475 18.7005C25.2283 17.9503 25.0302 16.6385 24.903 15.5886C24.7504 14.2378 24.7481 12.8734 24.7824 11.5167C24.7877 11.2962 24.576 11.5752 24.5387 11.6178C24.2725 11.9234 24.0442 12.3012 23.8349 12.6441C23.5575 13.0987 23.2878 13.5609 23.0524 14.0392C22.9264 14.2952 22.6892 14.6392 22.6821 14.9271C22.6502 16.1845 22.6496 17.4484 22.7708 18.7017C22.8536 19.5547 22.9731 20.4308 23.2913 21.233C23.3422 21.3613 23.3995 21.489 23.4646 21.6137C22.1622 21.0031 20.8314 20.4545 19.4823 19.9673C16.4387 18.8684 13.2264 18.0242 9.98171 17.861C7.72943 17.7475 5.0241 17.9225 3.2509 19.498C2.58256 20.0915 2.07981 20.8541 1.61434 21.6084C1.06251 22.5022 0.485833 23.4593 0.167037 24.4684C-0.0565347 25.1766 -0.0648151 25.8949 0.197793 26.596C0.795166 28.1927 2.39447 29.2964 3.82994 30.0785C6.0556 31.291 8.54801 32.0069 11.0327 32.4532C14.1302 33.0101 17.3081 33.1301 20.4428 32.8694C22.7572 32.6767 25.0544 32.2706 27.2925 31.6504C27.7438 31.4855 28.6878 30.8559 25.792 28.8578C25.6021 28.8909 25.4117 28.9222 25.2212 28.9518C22.4834 29.3798 19.6964 29.5075 16.9313 29.3236C14.5158 29.1628 12.1039 28.7691 9.78534 28.0662C7.96897 27.5159 6.16029 26.7787 4.60416 25.6774C3.56024 24.9384 2.49443 23.9447 2.16853 22.6613C2.15138 22.5933 2.13719 22.5247 2.12477 22.4561C2.32468 22.3391 2.53228 22.235 2.74461 22.141C4.39893 21.4494 6.26853 21.3631 8.03758 21.4636C10.3389 21.5942 12.6184 22.0766 14.8269 22.7216C19.2079 24.0002 23.5119 25.9404 27.2683 28.5658H27.2695C27.2695 28.5658 29.2089 29.9444 30.0712 30.7607C30.0712 30.7607 30.0712 30.7607 30.0706 30.7607C31.2399 31.8071 32.3028 32.9782 33.1072 34.3178C33.148 34.3857 33.5052 33.9087 33.5413 33.8608C33.827 33.4688 34.086 33.0444 34.3267 32.6241C34.5692 32.2002 34.8141 31.771 35.0087 31.3229C35.0708 31.1793 35.2601 30.8784 35.1861 30.7229C34.8928 30.1075 34.6195 29.4827 34.364 28.8507C34.9685 28.5315 35.5635 28.1945 36.1484 27.8404C36.5205 29.0363 36.9345 30.2216 37.4254 31.3738C37.8643 32.4036 38.3575 33.4552 39.0643 34.3325C39.4967 34.8693 40.2473 35.5562 41.0091 35.3517C41.2285 35.2932 41.3834 35.1749 41.5366 35.0141C42.1648 34.3532 42.6273 33.4783 43.0549 32.6856C43.4778 31.9023 43.8469 31.116 43.9451 30.2263C44.084 28.9725 43.9622 27.6914 43.9031 26.4364C43.8735 25.8021 43.8463 25.1666 43.8611 24.5311L43.8593 24.5329Z" 
+                fill="#3B4B65" 
+              />
+            </Svg>
+          </View>
+          <Text style={styles.versionText}>Sürüm v{pkg.version}</Text>
+          <Text style={styles.footerSubtext}>hey!</Text>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  mainContent: {
+    flex: 1,
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    paddingBottom: 100, // Space for tab bar
+  },
+  cardsContainer: {
+    gap: 12,
+    marginTop: 0,
+  },
+  card: {
+    borderRadius: 16,
+    padding: 16,
+    width: '100%',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cardIcon: {
+    width: 24,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  cardTextContent: {
+    flex: 1,
+    gap: 4,
+  },
+  cardTitle: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontFamily: 'Inter-Bold',
+    fontWeight: 'bold',
+  },
+  cardDescription: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    opacity: 0.5,
+    lineHeight: 16,
+  },
+  boldText: {
+    fontWeight: 'bold',
+    opacity: 1,
+  },
+  rateButton: {
+    backgroundColor: '#EF720D',
+    height: 48,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginTop: 12,
+  },
+  starsRow: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  rateText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    fontWeight: '600',
+  },
+  footer: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoContainer: {
+    opacity: 0.3,
+    marginBottom: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  versionText: {
+    color: '#8191AB',
+    fontSize: 10,
+    fontFamily: 'Inter-Regular',
+    opacity: 0.5,
+  },
+  footerSubtext: {
+    color: '#8191AB',
+    fontSize: 10,
+    fontFamily: 'Inter-Regular',
+    opacity: 0.5,
+    marginTop: -6,
+  },
+});
+
+export default SettingsScreen;
