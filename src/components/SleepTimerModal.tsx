@@ -4,7 +4,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import useMixerStore from '../store/useMixerStore';
 
 const SleepTimerModal = () => {
-  const { showSleepModal, setShowSleepModal } = useMixerStore();
+  const showSleepModal = useMixerStore(state => state.showSleepModal);
+  const setShowSleepModal = useMixerStore(state => state.setShowSleepModal);
   const [countdown, setCountdown] = useState(30);
 
   useEffect(() => {

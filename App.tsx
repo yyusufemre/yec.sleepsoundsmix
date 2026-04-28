@@ -9,7 +9,7 @@ import useMixerStore from './src/store/useMixerStore';
 import SleepFlowOverlay from './src/components/SleepFlowOverlay';
 
 const App = () => {
-  const { isSleepFlowActive } = useMixerStore();
+  const isSleepFlowActive = useMixerStore(state => state.isSleepFlowActive);
   
   useEffect(() => {
     setupTrackPlayer();

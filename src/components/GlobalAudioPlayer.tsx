@@ -5,7 +5,8 @@ import useMixerStore from '../store/useMixerStore';
 import { MOCK_SOUNDS } from '../data/mockSounds';
 
 const GlobalAudioPlayer = () => {
-  const { activeSounds, isPausedBySystem } = useMixerStore();
+  const activeSounds = useMixerStore(state => state.activeSounds);
+  const isPausedBySystem = useMixerStore(state => state.isPausedBySystem);
 
   const activeSoundItems = MOCK_SOUNDS.filter(s => activeSounds[s.id] !== undefined);
 

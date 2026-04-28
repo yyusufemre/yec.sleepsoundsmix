@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../theme/colors';
 import MixerItem from '../components/MixerItem';
 import useMixerStore from '../store/useMixerStore';
 import HeaderComponent from '../components/HeaderComponent';
@@ -12,7 +11,10 @@ import ActionButton from '../components/ActionButton';
 
 const MixerScreen = () => {
   const navigation = useNavigation();
-  const { activeSounds, toggleSound, clearMix, setVolume } = useMixerStore();
+  const activeSounds = useMixerStore(state => state.activeSounds);
+  const toggleSound = useMixerStore(state => state.toggleSound);
+  const clearMix = useMixerStore(state => state.clearMix);
+  const setVolume = useMixerStore(state => state.setVolume);
 
   const activeSoundItems = MOCK_SOUNDS.filter(s => activeSounds[s.id] !== undefined);
 

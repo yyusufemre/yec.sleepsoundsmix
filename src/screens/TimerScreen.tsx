@@ -145,17 +145,15 @@ const btnStyles = StyleSheet.create({
 const PRESET_TIMES = [1, 5, 10, 20, 30, 45, 60, 90];
 
 const TimerScreen = () => {
-  const {
-    timer,
-    setTimer,
-    isTimerRunning,
-    toggleTimer,
-    targetTimestamp,
-    isSleepFlowEnabled,
-    setSleepFlowEnabled,
-    isSleepFlowActive,
-    setSleepFlowActive
-  } = useMixerStore();
+  const timer = useMixerStore(state => state.timer);
+  const setTimer = useMixerStore(state => state.setTimer);
+  const isTimerRunning = useMixerStore(state => state.isTimerRunning);
+  const toggleTimer = useMixerStore(state => state.toggleTimer);
+  const targetTimestamp = useMixerStore(state => state.targetTimestamp);
+  const isSleepFlowEnabled = useMixerStore(state => state.isSleepFlowEnabled);
+  const setSleepFlowEnabled = useMixerStore(state => state.setSleepFlowEnabled);
+  const isSleepFlowActive = useMixerStore(state => state.isSleepFlowActive);
+  const setSleepFlowActive = useMixerStore(state => state.setSleepFlowActive);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -163,7 +161,7 @@ const TimerScreen = () => {
       if (!isTimerRunning) {
         setTimer(0);
       }
-    }, [isTimerRunning])
+    }, [isTimerRunning, setTimer])
   );
   const [displayTime, setDisplayTime] = useState('00:00');
   const [progress, setProgress] = useState(0);

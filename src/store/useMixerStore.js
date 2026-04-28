@@ -2,6 +2,8 @@ import { create } from 'zustand';
 
 const useMixerStore = create((set, get) => ({
   activeSounds: {},
+  unlockedSoundIds: [], // TODO: AsyncStorage ile persist edilecek
+
   timer: 0,
   isTimerRunning: false,
   intervalId: null,
@@ -13,6 +15,17 @@ const useMixerStore = create((set, get) => ({
   
   setSleepFlowEnabled: (enabled) => set({ isSleepFlowEnabled: enabled }),
   setSleepFlowActive: (active) => set({ isSleepFlowActive: active }),
+  
+  unlockSounds: (newIds) => set((state) => {
+    const updated = [...state.unlockedSoundIds];
+    newIds.forEach(id => {
+      if (!updated.includes(id)) {
+        updated.push(id);
+      }
+    });
+    return { unlockedSoundIds: updated };
+  }),
+
   
   toggleSound: (soundId) => set((state) => {
     const newSounds = { ...state.activeSounds };

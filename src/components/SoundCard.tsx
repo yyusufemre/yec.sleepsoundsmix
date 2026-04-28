@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
+import GlassCard from './GlassCard';
+import AppText from './AppText';
+import AppBadge from './AppBadge';
 import { colors } from '../theme/colors';
 
 interface SoundCardProps {
@@ -9,41 +11,62 @@ interface SoundCardProps {
   iconName: string;
   isLocked: boolean;
   isActive: boolean;
+  disabled?: boolean;
+  isLoading?: boolean;
   onPress: () => void;
 }
 
-const SoundCard: React.FC<SoundCardProps> = ({ title, iconName, isLocked, isActive, onPress }) => {
-  const gradientColors = isActive
-    ? [colors.glass.cardNormal[0], 'rgba(52, 113, 236, 0.2)']
-    : isLocked ? colors.glass.cardAd : colors.glass.cardNormal;
+const SoundCard: React.FC<SoundCardProps> = ({ title, iconName, isLocked, isActive, disabled, isLoading, onPress }) => {
+  const getVariant = () => {
+    if (isActive) return 'active';
+    return 'normal';
+  };
 
   return (
     <TouchableOpacity
-      style={[styles.touchable, isActive && styles.activeBorder, isLocked && styles.lockedContainer]}
+      style={styles.touchable}
       onPress={onPress}
       activeOpacity={0.7}
+      disabled={disabled || isLoading}
     >
-      <LinearGradient
-        colors={gradientColors}
-        style={styles.container}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
+      <GlassCard
+        variant={getVariant()}
+        contentStyle={styles.container}
+        style={[styles.baseBorder, isActive && styles.activeBorder]}
       >
-        <Icon name={iconName} size={24} color={isActive || isLocked ? colors.text.primary : colors.text.secondary} style={[styles.icon, isLocked && styles.lockedTextOpacity]} solid />
-        <Text style={[styles.title, isLocked && styles.lockedTextOpacity]}>{title}</Text>
+        <Icon 
+          name={iconName} 
+          size={24} 
+          color={isActive ? colors.text.primary : colors.text.secondary} 
+          style={styles.icon}
+          solid 
+        />
+        <AppText 
+          variant="small" 
+          weight="medium" 
+          color={isActive ? 'primary' : 'secondary'}
+          style={styles.title}
+          numberOfLines={1}
+        >
+          {title}
+        </AppText>
 
-        {isActive && (
+        {isLoading && (
+          <View style={styles.statusBadge}>
+            <ActivityIndicator size="small" color={colors.text.primary} />
+          </View>
+        )}
+
+        {isActive && !isLoading && (
           <View style={styles.statusBadge}>
             <Icon name="circle-check" size={16} color={colors.accent.success} solid />
           </View>
         )}
 
-        {isLocked && (
-          <View style={[styles.statusBadge, styles.adBadge]}>
-            <Text style={styles.adBadgeText}>Ad</Text>
-          </View>
+        {isLocked && !isActive && !isLoading && (
+          <AppBadge variant="ad" label="Ad" style={styles.statusBadge} />
         )}
-      </LinearGradient>
+      </GlassCard>
     </TouchableOpacity>
   );
 };
@@ -53,54 +76,34 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 6,
     borderRadius: 16,
-    overflow: 'hidden', // to clip gradient
-    borderColor: colors.glass.border,
-    borderWidth: 0,
+    maxWidth: '47%',
+  },
+  baseBorder: {
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   container: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 20,
+    gap: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 10,
+    paddingRight: 24,
     minHeight: 80,
   },
   activeBorder: {
-    borderColor: 'transparent',
-    borderWidth: 1,
-  },
-  lockedContainer: {
-    opacity: 0.7,
+    borderColor: colors.accent.primary,
   },
   icon: {
-    marginRight: 10,
   },
   title: {
-    color: colors.text.primary,
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
     flexShrink: 1,
-  },
-  lockedTextOpacity: {
-    opacity: 0.3,
   },
   statusBadge: {
     position: 'absolute',
     bottom: 8,
     right: 8,
   },
-  adBadge: {
-    backgroundColor: '#FABB18',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  adBadgeText: {
-    color: '#000000',
-    fontSize: 8,
-    fontFamily: 'Inter-Bold',
-    fontWeight: 'bold',
-  }
 });
 
 export default SoundCard;

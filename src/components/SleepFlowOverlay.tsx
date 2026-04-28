@@ -17,6 +17,7 @@ import { PEACEFUL_WORDS } from '../data/sleepFlowWords';
 const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => void }) => {
   const fadeAnim = useRef(new Animated.Value(0.1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const onFinishedRef = useRef(onFinished);
   const screenW = Dimensions.get('window').width;
   const screenH = Dimensions.get('window').height;
 
@@ -38,6 +39,10 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
       fontSize: 8 + Math.random() * 16, // Random size between 8 and 24
     };
   });
+
+  useEffect(() => {
+    onFinishedRef.current = onFinished;
+  }, [onFinished]);
 
   useEffect(() => {
     const animation = Animated.sequence([
@@ -65,13 +70,13 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
     }).start();
 
     animation.start(({ finished }) => {
-      if (finished) onFinished();
+      if (finished) onFinishedRef.current();
     });
 
     return () => {
       animation.stop();
     };
-  }, []);
+  }, [fadeAnim, slideAnim]);
 
   return (
     <View
@@ -93,11 +98,9 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
 };
 
 const SleepFlowOverlay = () => {
-  const {
-    setSleepFlowActive,
-    targetTimestamp,
-    stopTimer
-  } = useMixerStore();
+  const setSleepFlowActive = useMixerStore(state => state.setSleepFlowActive);
+  const targetTimestamp = useMixerStore(state => state.targetTimestamp);
+  const stopTimer = useMixerStore(state => state.stopTimer);
 
   const [words, setWords] = useState<{ id: number, text: string }[]>([]);
   const [showControls, setShowControls] = useState(false);
@@ -138,7 +141,7 @@ const SleepFlowOverlay = () => {
     updateTime();
     const timeInterval = setInterval(updateTime, 1000);
     return () => clearInterval(timeInterval);
-  }, [targetTimestamp]);
+  }, [setSleepFlowActive, stopTimer, targetTimestamp]);
 
   const handleScreenPress = () => {
     if (showControls) {
