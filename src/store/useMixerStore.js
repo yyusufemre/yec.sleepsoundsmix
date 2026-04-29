@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Alert } from 'react-native';
 
 const useMixerStore = create((set, get) => ({
   activeSounds: {},
@@ -29,12 +30,26 @@ const useMixerStore = create((set, get) => ({
   
   toggleSound: (soundId) => set((state) => {
     const newSounds = { ...state.activeSounds };
+    let isAdding = false;
+    
     if (newSounds[soundId] !== undefined) {
       delete newSounds[soundId];
     } else {
+      if (Object.keys(newSounds).length >= 8) {
+        Alert.alert(
+          'Limit Aşıldı',
+          'Aynı anda en fazla 8 farklı ses karıştırabilirsiniz. Lütfen yeni bir ses seçmeden önce mevcut seslerden birini kapatın.'
+        );
+        return state; // Değişiklik yapmadan çık
+      }
       newSounds[soundId] = 50; // Default volume 50%
+      isAdding = true;
     }
-    return { activeSounds: newSounds };
+    
+    return { 
+      activeSounds: newSounds,
+      ...(isAdding && { isPausedBySystem: false })
+    };
   }),
   
   setVolume: (soundId, volume) => set((state) => {

@@ -7,9 +7,16 @@ jest.mock('react-native-track-player', () => ({
   play: jest.fn(),
   pause: jest.fn(),
   stop: jest.fn(),
+  reset: jest.fn(),
   getState: jest.fn(),
+  setVolume: jest.fn(),
   addEventListener: jest.fn(),
   registerPlaybackService: jest.fn(),
+  setRepeatMode: jest.fn(),
+  getQueue: jest.fn().mockResolvedValue([]),
+  getActiveTrackIndex: jest.fn().mockResolvedValue(0),
+  skip: jest.fn(),
+  updateNowPlayingMetadata: jest.fn(),
   Event: {
     RemotePlay: 'RemotePlay',
     RemotePause: 'RemotePause',
@@ -23,10 +30,17 @@ jest.mock('react-native-track-player', () => ({
   AppKilledPlaybackBehavior: {
     StopPlaybackAndRemoveNotification: 'StopPlaybackAndRemoveNotification',
   },
+  RepeatMode: {
+    Off: 0,
+    Track: 1,
+    Queue: 2,
+  },
   State: {
     Playing: 'playing',
     Paused: 'paused',
     Stopped: 'stopped',
+    None: 'none',
+    Ended: 'ended',
   }
 }));
 
