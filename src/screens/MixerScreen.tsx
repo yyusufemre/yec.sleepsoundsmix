@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-SemiBold',
     letterSpacing: 0.8,
-    textTransform: 'uppercase',
+    textTransform: 'capitalize',
     marginBottom: layout.spacing.sm,
   },
   savedMixCard: {
