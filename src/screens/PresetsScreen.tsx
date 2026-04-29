@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import HeaderComponent from '../components/HeaderComponent';
 import PresetCard from '../components/PresetCard';
+import useMixerStore from '../store/useMixerStore';
 
 const EXAMPLES = [
   {
@@ -51,6 +52,9 @@ const EXAMPLES = [
 ];
 
 const PresetsScreen = () => {
+  const activeSounds = useMixerStore((state: any) => state.activeSounds);
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 180 : 110;
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent
@@ -59,7 +63,7 @@ const PresetsScreen = () => {
       />
       <ScrollView
         style={styles.content}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: dynamicPadding }]}
         showsVerticalScrollIndicator={false}
       >
         {EXAMPLES.map((item) => (

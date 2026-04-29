@@ -9,7 +9,7 @@ import useMixerStore from '../store/useMixerStore';
 import AppText from '../components/AppText';
 
 const LibraryScreen = () => {
-  const activeSounds = useMixerStore(state => state.activeSounds);
+  const activeSounds = useMixerStore((state: any) => state.activeSounds) || {};
   const toggleSound = useMixerStore(state => state.toggleSound);
   const unlockedSoundIds = useMixerStore(state => state.unlockedSoundIds);
   const unlockSounds = useMixerStore(state => state.unlockSounds);
@@ -55,7 +55,7 @@ const LibraryScreen = () => {
 
   const renderItem = ({ item }: { item: any }) => {
     const isActuallyLocked = item.isLocked && !unlockedSoundIds.includes(item.id);
-    const isActive = activeSounds[item.id] !== undefined;
+    const isActive = activeSounds && activeSounds[item.id] !== undefined;
 
     return (
       <SoundCard
@@ -78,6 +78,8 @@ const LibraryScreen = () => {
     loadingAdSoundId
   }), [activeSounds, unlockedSoundIds, loadingAdSoundId]);
 
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 180 : 100;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
@@ -97,7 +99,7 @@ const LibraryScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={2}
-        contentContainerStyle={[styles.listContent, filteredSounds.length === 0 && styles.emptyListContent]}
+        contentContainerStyle={[styles.listContent, { paddingBottom: dynamicPadding }, filteredSounds.length === 0 && styles.emptyListContent]}
         extraData={flatListExtraData}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>

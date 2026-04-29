@@ -100,11 +100,14 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
 const SleepFlowOverlay = () => {
   const setSleepFlowActive = useMixerStore(state => state.setSleepFlowActive);
   const targetTimestamp = useMixerStore(state => state.targetTimestamp);
+  const timer = useMixerStore(state => state.timer);
   const stopTimer = useMixerStore(state => state.stopTimer);
 
   const [words, setWords] = useState<{ id: number, text: string }[]>([]);
   const [showControls, setShowControls] = useState(false);
   const [remainingTime, setRemainingTime] = useState('');
+  const [remainingRatio, setRemainingRatio] = useState(1);
+  const totalMsRef = useRef<number>(0);
   const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wordIdCounter = useRef(0);
 
@@ -124,6 +127,12 @@ const SleepFlowOverlay = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Set total duration once on mount from the store's timer value (minutes)
+  useEffect(() => {
+    if (timer > 0) totalMsRef.current = timer * 60 * 1000;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const updateTime = () => {
       if (!targetTimestamp) return;
@@ -135,6 +144,8 @@ const SleepFlowOverlay = () => {
         const m = Math.floor(diff / 60000);
         const s = Math.floor((diff % 60000) / 1000);
         setRemainingTime(`${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+        const total = totalMsRef.current > 0 ? totalMsRef.current : diff;
+        setRemainingRatio(Math.min(1, Math.max(0, diff / total)));
       }
     };
 
@@ -158,11 +169,6 @@ const SleepFlowOverlay = () => {
     setWords(prev => prev.filter(w => w.id !== id));
   };
 
-  const handleStop = () => {
-    stopTimer();
-    setSleepFlowActive(false);
-  };
-
   useEffect(() => {
     return () => {
       if (controlsTimer.current) clearTimeout(controlsTimer.current);
@@ -176,7 +182,7 @@ const SleepFlowOverlay = () => {
       <StatusBar hidden />
 
       {/* 1. Words Layer */}
-      <View style={[StyleSheet.absoluteFill, { zIndex: 1 }]} pointerEvents="none">
+      <View style={styles.wordsLayer} pointerEvents="none">
         {words.map(word => (
           <DriftingWord
             key={word.id}
@@ -188,28 +194,25 @@ const SleepFlowOverlay = () => {
 
       {/* 2. Interaction Layer */}
       <Pressable
-        style={[StyleSheet.absoluteFill, { zIndex: 2 }]}
+        style={styles.pressableLayer}
         onPress={handleScreenPress}
       >
         {showControls && (
-          <View style={styles.controlsContainer}>
-            <View style={styles.header}>
-              <View style={{ width: 44 }} />
+          <View style={styles.bottomPanel}>
+            {/* Progress bar — full width, minimal */}
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${remainingRatio * 100}%` }]} />
+            </View>
+
+            {/* Row: time left + close */}
+            <View style={styles.controlsRow}>
               <Text style={styles.timerText}>{remainingTime}</Text>
               <TouchableOpacity
                 onPress={() => setSleepFlowActive(false)}
                 style={styles.closeButton}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               >
-                <Icon name="xmark" size={24} color="rgba(255,255,255,0.6)" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.footer}>
-              <TouchableOpacity
-                style={styles.stopBtn}
-                onPress={handleStop}
-              >
-                <Text style={styles.stopBtnText}>Zamanlayıcıyı Durdur</Text>
+                <Icon name="xmark" size={18} color="rgba(255,255,255,0.5)" />
               </TouchableOpacity>
             </View>
           </View>
@@ -225,13 +228,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000ff',
     zIndex: 9999,
   },
-  touchArea: {
-    flex: 1,
-  },
   wordsLayer: {
     ...StyleSheet.absoluteFill,
     zIndex: 1,
-    elevation: 1,
+  },
+  pressableLayer: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 2,
   },
   wordContainer: {
     position: 'absolute',
@@ -242,45 +245,39 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Light',
     letterSpacing: 2,
   },
-  controlsContainer: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    justifyContent: 'space-between',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
+  bottomPanel: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingBottom: 48,
     zIndex: 2,
   },
-  header: {
+  progressTrack: {
+    width: '100%',
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: 'rgba(255,255,255,0.25)',
+  },
+  controlsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 14,
   },
   closeButton: {
-    width: 44,
-    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
   timerText: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 18,
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: 14,
     fontFamily: 'Inter-Medium',
-  },
-  footer: {
-    alignItems: 'center',
-  },
-  stopBtn: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  stopBtnText: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 15,
-    fontFamily: 'Inter-SemiBold',
+    letterSpacing: 1,
   },
 });
 

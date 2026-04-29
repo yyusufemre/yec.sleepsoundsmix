@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import useMixerStore from '../store/useMixerStore';
 import NativeSoundManager from '../services/NativeSoundManager';
 import { MOCK_SOUNDS } from '../data/mockSounds';
@@ -7,11 +7,17 @@ import TrackPlayer, { State, RepeatMode } from 'react-native-track-player';
 import { setupTrackPlayer } from '../services/TrackPlayerSetup';
 
 const GlobalAudioPlayer = () => {
-  const activeSounds = useMixerStore(state => state.activeSounds);
+  const activeSounds = useMixerStore((state: any) => state.activeSounds) || {};
   const isPausedBySystem = useMixerStore(state => state.isPausedBySystem);
 
-  const activeSoundItems = MOCK_SOUNDS.filter(s => activeSounds[s.id] !== undefined);
-  const activeTitle = activeSoundItems.map(s => s.title).join(', ');
+  const activeSoundItems = React.useMemo(() => 
+    MOCK_SOUNDS.filter(s => activeSounds && activeSounds[s.id] !== undefined),
+    [activeSounds]
+  );
+  const activeTitle = React.useMemo(() => 
+    activeSoundItems.map(s => s.title).join(', '),
+    [activeSoundItems]
+  );
 
   useEffect(() => {
     const syncTrackPlayer = async () => {
@@ -53,7 +59,7 @@ const GlobalAudioPlayer = () => {
         } else {
           try {
             await TrackPlayer.stop(); // Ses yoksa bildirimi tamamen yokediyoruz
-          } catch (e) {
+          } catch {
             // Sessizce geç. RemoteStop zaten reset atmış olabilir.
           }
         }
@@ -65,30 +71,45 @@ const GlobalAudioPlayer = () => {
     syncTrackPlayer();
   }, [activeTitle, isPausedBySystem]);
 
-  // SPIKE TEST: NativeSoundManager ile 2 sesi yönet
+  const prevSoundIdsRef = React.useRef<Set<string>>(new Set());
+  const activeSoundIds = React.useMemo(() => 
+    Object.keys(activeSounds).sort().join(','), 
+    [activeSounds]
+  );
+
   useEffect(() => {
+    const currentIds = new Set(activeSoundItems.map(s => s.id));
+
+    // Stop sounds that were removed from the mix
+    prevSoundIdsRef.current.forEach(id => {
+      if (!currentIds.has(id)) {
+        NativeSoundManager.stop(id);
+      }
+    });
+
     // Tüm sesleri Native katmanda yönetiyoruz.
     if (isPausedBySystem || activeSoundItems.length === 0) {
       NativeSoundManager.pauseAll();
     } else {
       activeSoundItems.forEach(sound => {
-        const volume = activeSounds[sound.id] / 100;
+        // Safe volume calculation to avoid NaN
+        const volumeVal = activeSounds[sound.id];
+        const volume = (typeof volumeVal === 'number' ? volumeVal : 50) / 100;
+        
         NativeSoundManager.play(sound.id, sound.url, volume);
         NativeSoundManager.setVolume(sound.id, volume);
       });
     }
-  }, [activeSoundItems, activeSounds, isPausedBySystem]);
+    prevSoundIdsRef.current = currentIds;
+  }, [activeSoundIds, activeSounds, isPausedBySystem, activeSoundItems]);
 
   if (activeSoundItems.length === 0) return null;
 
-  return (
-    <View style={{ width: 0, height: 0, opacity: 0 }}>
-      {/* 
-        SPIKE sırasında react-native-video bileşenlerini GİZLİYORUZ (render etmiyoruz). 
-        Eğer test başarılı olursa bu bloğu tamamen sileceğiz.
-      */}
-    </View>
-  );
+  return <View style={styles.hidden} />;
 };
+
+const styles = StyleSheet.create({
+  hidden: { width: 0, height: 0, opacity: 0 },
+});
 
 export default GlobalAudioPlayer;

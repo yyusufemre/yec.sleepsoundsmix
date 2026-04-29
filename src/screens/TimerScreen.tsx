@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Circle } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
@@ -9,7 +9,7 @@ import HeaderComponent from '../components/HeaderComponent';
 import ActionButton from '../components/ActionButton';
 
 // ─── Circular progress ring ───────────────────────────────────────────────────
-const CIRCLE_SIZE = 160;
+const CIRCLE_SIZE = 128;
 const STROKE_WIDTH = 3;
 const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -74,7 +74,7 @@ const ringStyles = StyleSheet.create({
   },
   timeText: {
     color: '#FFFFFF',
-    fontSize: 44,
+    fontSize: 34,
     fontWeight: 'bold',
     fontFamily: 'Inter-Bold',
     textAlign: 'center',
@@ -145,6 +145,7 @@ const btnStyles = StyleSheet.create({
 const PRESET_TIMES = [1, 5, 10, 20, 30, 45, 60, 90];
 
 const TimerScreen = () => {
+  const activeSounds = useMixerStore((state: any) => state.activeSounds);
   const timer = useMixerStore(state => state.timer);
   const setTimer = useMixerStore(state => state.setTimer);
   const isTimerRunning = useMixerStore(state => state.isTimerRunning);
@@ -217,8 +218,10 @@ const TimerScreen = () => {
     return () => { if (intervalId) clearInterval(intervalId); };
   }, [isTimerRunning, targetTimestamp, timer]);
 
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 170 : 100;
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: dynamicPadding }]}>
       <HeaderComponent
         title="Huzuru Zamanla"
         subtitle="Uykuya dalarken seslerin ne zaman duracağını belirleyin, enerjinizi koruyun."
@@ -229,20 +232,41 @@ const TimerScreen = () => {
         <TimerRing progress={progress} displayTime={displayTime} />
       </View>
 
-      {/* Sleep Flow Toggle */}
-      <View style={styles.toggleRow}>
-        <View style={styles.toggleInfo}>
-          <Icon name="wind" size={16} color={isSleepFlowEnabled ? "#47F185" : "rgba(255,255,255,0.3)"} />
-          <Text style={styles.toggleLabel}>Uyku Akışı Modu</Text>
-        </View>
-        <Switch
-          value={isSleepFlowEnabled}
-          onValueChange={setSleepFlowEnabled}
-          trackColor={{ false: 'rgba(255,255,255,0.1)', true: 'rgba(71, 241, 133, 0.4)' }}
-          thumbColor={isSleepFlowEnabled ? '#47F185' : '#8191AB'}
-          ios_backgroundColor="rgba(255,255,255,0.1)"
+      {/* Sleep Flow Toggle — pill button */}
+      <TouchableOpacity
+        style={[
+          styles.sleepFlowBtn,
+          timer > 0 && isSleepFlowEnabled && styles.sleepFlowBtnActive,
+          timer === 0 && styles.sleepFlowBtnDisabled,
+        ]}
+        onPress={() => {
+          if (timer === 0) return;
+          if (isSleepFlowEnabled) {
+            setSleepFlowActive(true);
+          } else {
+            setSleepFlowEnabled(true);
+          }
+        }}
+        disabled={timer === 0}
+        activeOpacity={timer > 0 ? 0.75 : 1}
+      >
+        <Icon
+          name="wind"
+          size={14}
+          color={timer > 0 && isSleepFlowEnabled ? '#47F185' : 'rgba(255,255,255,0.35)'}
         />
-      </View>
+        <Text style={[
+          styles.sleepFlowLabel,
+          timer > 0 && isSleepFlowEnabled && styles.sleepFlowLabelActive,
+        ]}>
+          Uyku Akışı Modu
+        </Text>
+        {/* State indicator dot */}
+        <View style={[
+          styles.sleepFlowDot,
+          timer > 0 && isSleepFlowEnabled && styles.sleepFlowDotActive,
+        ]} />
+      </TouchableOpacity>
 
       {/* Preset buttons grid */}
       <View style={styles.presetGrid}>
@@ -256,28 +280,20 @@ const TimerScreen = () => {
         ))}
       </View>
 
-      {/* Start/Stop and Re-enter section */}
+      {/* Action section — always rendered to avoid layout shift */}
       <View style={styles.actionSection}>
-        {(timer > 0 || isTimerRunning) && (
-          <ActionButton
-            title={isTimerRunning ? 'Zamanlayıcıyı Durdur' : 'Zamanlayıcıyı Başlat'}
-            icon={isTimerRunning ? 'stop' : 'play'}
-            onPress={handleStartStop}
-            type={isTimerRunning ? 'danger' : 'success'}
-            disabled={timer === 0}
-            style={styles.actionBtnContainer}
-          />
-        )}
-
-        {isTimerRunning && isSleepFlowEnabled && !isSleepFlowActive && (
-          <TouchableOpacity
-            style={styles.reEnterFlow}
-            onPress={() => setSleepFlowActive(true)}
-          >
-            <Text style={styles.reEnterText}>Uyku Akışına Dön</Text>
-            <Icon name="arrow-right" size={12} color="#47F185" />
-          </TouchableOpacity>
-        )}
+        <View style={styles.actionBtnWrapper}>
+          {(timer > 0 || isTimerRunning) && (
+            <ActionButton
+              title={isTimerRunning ? 'Zamanlayıcıyı Durdur' : 'Zamanlayıcıyı Başlat'}
+              icon={isTimerRunning ? 'stop' : 'play'}
+              onPress={handleStartStop}
+              type={isTimerRunning ? 'danger' : 'success'}
+              disabled={timer === 0}
+              style={styles.actionBtnContainer}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
@@ -289,31 +305,40 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 110,
     paddingTop: 0,
   },
   circleSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 10,
   },
   presetGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 15,
+    gap: 10,
     paddingHorizontal: 20,
     width: '100%',
   },
   actionSection: {
     width: '100%',
     alignItems: 'center',
-    minHeight: 120,
+    paddingBottom: 8,
+  },
+  actionBtnWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    height: 56,
     justifyContent: 'center',
   },
   actionBtnContainer: {
     width: '90%',
-    height: 64,
+    height: 56,
+  },
+  reEnterWrapper: {
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
   },
   actionButton: {
     flexDirection: 'row',
@@ -331,27 +356,38 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'Inter-Bold',
   },
-  toggleRow: {
+  sleepFlowBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '90%',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    paddingVertical: 12,
+    gap: 8,
+    paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
-  toggleInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  sleepFlowBtnActive: {
+    backgroundColor: 'rgba(71, 241, 133, 0.1)',
   },
-  toggleLabel: {
-    color: '#FFFFFF',
-    fontSize: 14,
+  sleepFlowBtnDisabled: {
+    opacity: 0.4,
+  },
+  sleepFlowLabel: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 13,
     fontFamily: 'Inter-Medium',
+  },
+  sleepFlowLabelActive: {
+    color: '#47F185',
+  },
+  sleepFlowDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    marginLeft: 2,
+  },
+  sleepFlowDotActive: {
+    backgroundColor: '#47F185',
   },
   reEnterFlow: {
     flexDirection: 'row',

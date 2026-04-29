@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MixerItem from '../components/MixerItem';
 import useMixerStore from '../store/useMixerStore';
@@ -8,29 +8,49 @@ import { MOCK_SOUNDS } from '../data/mockSounds';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { useNavigation } from '@react-navigation/native';
 import ActionButton from '../components/ActionButton';
+import GlassCard from '../components/GlassCard';
+import GlassBlur from '../components/GlassBlur';
+import { colors } from '../theme/colors';
+import { layout } from '../theme/layout';
 
 const MixerScreen = () => {
   const navigation = useNavigation();
-  const activeSounds = useMixerStore(state => state.activeSounds);
-  const toggleSound = useMixerStore(state => state.toggleSound);
-  const clearMix = useMixerStore(state => state.clearMix);
-  const setVolume = useMixerStore(state => state.setVolume);
+  const activeSounds = useMixerStore((state: any) => state.activeSounds) || {};
+  const toggleSound = useMixerStore((state: any) => state.toggleSound);
+  const clearMix = useMixerStore((state: any) => state.clearMix);
+  const setVolume = useMixerStore((state: any) => state.setVolume);
+  const savedMixes = useMixerStore((state: any) => state.savedMixes) || [];
+  const saveMix = useMixerStore((state: any) => state.saveMix);
+  const loadMix = useMixerStore((state: any) => state.loadMix);
+  const deleteSavedMix = useMixerStore((state: any) => state.deleteSavedMix);
+
+  const [mixName, setMixName] = useState('');
 
   const activeSoundItems = MOCK_SOUNDS.filter(s => activeSounds[s.id] !== undefined);
+  const dynamicPadding = activeSoundItems.length > 0 ? 180 : 140;
+
+  const handleSave = () => {
+    saveMix(mixName);
+    setMixName('');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent
-        title={activeSoundItems.length > 0 ? "Senfonini Yönet" : "Kendi Senfonini Oluştur"}
+        title={activeSoundItems.length > 0 ? 'Senfonini Yönet' : 'Kendi Senfonini Oluştur'}
         subtitle={activeSoundItems.length > 0
-          ? "Seçtiğin seslerin dengesini ayarla ve sana özel mükemmel uyku ortamını yönet."
-          : "Henüz bir ses seçmedin. Rahatlamak için kütüphaneden beğendiğin sesleri eklemeye başla."
+          ? 'Seçtiğin seslerin dengesini ayarla ve sana özel mükemmel uyku ortamını yönet.'
+          : 'Henüz bir ses seçmedin. Rahatlamak için kütüphaneden beğendiğin sesleri eklemeye başla.'
         }
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: dynamicPadding }]}
+        showsVerticalScrollIndicator={false}
+      >
         {activeSoundItems.length > 0 ? (
           <>
+            {/* Active sound list */}
             <View style={styles.listContainer}>
               {activeSoundItems.map(sound => (
                 <MixerItem
@@ -38,26 +58,50 @@ const MixerScreen = () => {
                   title={sound.title}
                   iconName={sound.icon}
                   volume={activeSounds[sound.id]}
-                  onVolumeChange={(val) => setVolume(sound.id, val)}
+                  onVolumeChange={(val: number) => setVolume(sound.id, val)}
                   onRemove={() => toggleSound(sound.id)}
                 />
               ))}
             </View>
 
-            {/* Add more button */}
+            {/* Save Mix — GlassCard row */}
+            <GlassCard
+              variant="normal"
+              style={styles.saveMixCard}
+              contentStyle={styles.saveMixContent}
+            >
+              <Icon name="floppy-disk" size={15} color="rgba(255, 255, 255, 0.5)" solid />
+              <TextInput
+                style={styles.saveInput}
+                placeholder="Mix adı ver..."
+                placeholderTextColor={colors.text.muted}
+                value={mixName}
+                onChangeText={setMixName}
+                returnKeyType="done"
+                onSubmitEditing={handleSave}
+              />
+              <TouchableOpacity
+                style={styles.saveBtn}
+                onPress={handleSave}
+                activeOpacity={0.75}
+              >
+                <Text style={styles.saveBtnText}>Kaydet</Text>
+              </TouchableOpacity>
+            </GlassCard>
+
+            {/* Add more */}
             <View style={styles.addMoreSection}>
               <TouchableOpacity
                 style={styles.plusButton}
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('Library' as never)}
               >
-                <Icon name="plus" size={28} color="#FFFFFF" />
+                <Icon name="plus" size={24} color="#FFFFFF" />
               </TouchableOpacity>
-              <Text style={styles.addMoreText}>Başka Sesler Eklemek için + Tıklayın</Text>
             </View>
 
-            {/* Clear all button */}
-            <ActionButton 
+            {/* Clear all */}
+            <ActionButton
               title={`Tüm Sesleri Kaldır (${activeSoundItems.length})`}
               icon="trash-can"
               onPress={clearMix}
@@ -65,9 +109,10 @@ const MixerScreen = () => {
             />
           </>
         ) : (
+          /* Empty state */
           <View style={styles.emptyContainer}>
             <View style={styles.iconContainer}>
-              <Icon name="sliders" size={80} color="rgba(255, 255, 255, 0.2)" solid />
+              <Icon name="sliders" size={80} color={colors.text.muted} solid />
             </View>
 
             <TouchableOpacity
@@ -75,6 +120,7 @@ const MixerScreen = () => {
               activeOpacity={0.8}
               onPress={() => navigation.navigate('Library' as never)}
             >
+              <GlassBlur blurAmount={12} fallbackColor="rgba(47,52,72,0.7)" />
               <Text style={styles.addText}>
                 Mixleyeceğiniz sesleri eklemek için tıklayın.
               </Text>
@@ -82,6 +128,52 @@ const MixerScreen = () => {
                 <Icon name="plus" size={32} color="#FFFFFF" />
               </View>
             </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Saved Mixes — always visible if any */}
+        {savedMixes.length > 0 && (
+          <View style={styles.savedSection}>
+            <Text style={styles.savedTitle}>Kayıtlı Mixlerim</Text>
+            {savedMixes.map((mix: any) => (
+              <GlassCard
+                key={mix.id}
+                variant="normal"
+                style={styles.savedMixCard}
+                contentStyle={styles.savedMixContent}
+              >
+                {/* Left: icon + name + count */}
+                <View style={styles.savedMixLeft}>
+                  <View style={styles.savedMixIcon}>
+                    <Icon name="music" size={15} color={colors.accent.primary} solid />
+                  </View>
+                  <View>
+                    <Text style={styles.savedMixName}>{mix.name}</Text>
+                    <Text style={styles.savedMixMeta}>
+                      {Object.keys(mix.sounds).length} ses
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Right: load + delete */}
+                <View style={styles.savedMixActions}>
+                  <TouchableOpacity
+                    style={styles.loadBtn}
+                    onPress={() => loadMix(mix.id)}
+                    activeOpacity={0.75}
+                  >
+                    <Icon name="play" size={16} color={colors.accent.success} solid />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deleteBtn}
+                    onPress={() => deleteSavedMix(mix.id)}
+                    activeOpacity={0.75}
+                  >
+                    <Icon name="xmark" size={12} color={colors.text.secondary} />
+                  </TouchableOpacity>
+                </View>
+              </GlassCard>
+            ))}
           </View>
         )}
       </ScrollView>
@@ -95,15 +187,45 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 140, // Space for tab bar and footer
+    paddingHorizontal: layout.spacing.xl,
+    paddingBottom: 140,
     flexGrow: 1,
   },
   listContainer: {
     gap: 20,
     marginTop: 10,
-    marginBottom: 40,
+    marginBottom: 20,
   },
+
+  // ── Save Mix ───────────────────────────────────────────────
+  saveMixCard: {
+    marginBottom: 24,
+  },
+  saveMixContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: layout.spacing.md,
+    paddingVertical: layout.spacing.md,
+  },
+  saveInput: {
+    flex: 1,
+    color: colors.text.primary,
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+  },
+  saveBtn: {
+    backgroundColor: colors.accent.success,
+    paddingHorizontal: layout.spacing.lg,
+    paddingVertical: layout.spacing.sm,
+    borderRadius: layout.radius.pill,
+  },
+  saveBtnText: {
+    color: colors.text.dark,
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 13,
+  },
+
+  // ── Empty state ────────────────────────────────────────────
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
@@ -119,17 +241,18 @@ const styles = StyleSheet.create({
   },
   addBox: {
     width: '100%',
-    backgroundColor: 'rgba(47, 52, 72, 0.5)',
-    borderRadius: 24,
+    backgroundColor: 'transparent',
+    borderRadius: layout.radius.xxl,
     padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 40,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: colors.glass.border,
+    overflow: 'hidden',
   },
   addText: {
-    color: '#FFFFFF',
+    color: colors.text.primary,
     fontSize: 15,
     fontFamily: 'Inter-Light',
     textAlign: 'center',
@@ -142,32 +265,81 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  // ── Add more / Clear all ───────────────────────────────────
   addMoreSection: {
     alignItems: 'center',
-    gap: 16,
-    marginVertical: 30,
+    marginVertical: 20,
   },
   plusButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#3471EC',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.accent.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  addMoreText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontFamily: 'Inter-Light',
-    opacity: 0.8,
   },
   clearAllButton: {
-    marginTop: 10,
+    marginTop: 8,
+  },
+
+  // ── Saved Mixes ────────────────────────────────────────────
+  savedSection: {
+    marginTop: 32,
+    gap: layout.spacing.sm,
+  },
+  savedTitle: {
+    color: colors.text.secondary,
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    marginBottom: layout.spacing.sm,
+  },
+  savedMixCard: {
+    marginBottom: layout.spacing.sm,
+  },
+  savedMixContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  savedMixLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: layout.spacing.md,
+    flex: 1,
+  },
+  savedMixIcon: {
+    width: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  savedMixName: {
+    color: colors.text.primary,
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+  },
+  savedMixMeta: {
+    color: colors.text.muted,
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    marginTop: 2,
+  },
+  savedMixActions: {
+    flexDirection: 'row',
+    gap: layout.spacing.sm,
+  },
+  loadBtn: {
+    padding: layout.spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtn: {
+    padding: layout.spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.3,
   },
 });
 

@@ -9,12 +9,15 @@ import AppText from '../components/AppText';
 import AppButton from '../components/AppButton';
 import YecLogo from '../components/YecLogo';
 import { colors } from '../theme/colors';
+import useMixerStore from '../store/useMixerStore';
 
 const pkg = require('../../package.json');
 
 
-
 const SettingsScreen = () => {
+  const activeSounds = useMixerStore((state: any) => state.activeSounds);
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 180 : 100;
+
   const handleEmail = () => {
     Linking.openURL('mailto:info@yusufemre.com');
   };
@@ -26,7 +29,7 @@ const SettingsScreen = () => {
         subtitle="Uygulama kullanımı hakkında bilgi alabilir, bize ulaşabilir veya gelişmemize destek olabilirsiniz." 
       />
       
-      <View style={styles.mainContent}>
+      <View style={[styles.mainContent, { paddingBottom: dynamicPadding }]}>
         <View style={styles.cardsContainer}>
           {/* Nasıl Kullanılır - No Background */}
           <GlassCard contentStyle={styles.glassCardContent}>
