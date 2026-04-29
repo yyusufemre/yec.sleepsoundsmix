@@ -20,6 +20,11 @@ export const MOCK_SOUNDS = [
   { id: 'sinek1', title: 'Sinek Sesi', icon: 'mosquito', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/sinek-sesi-1.m4a', isLocked: true, category: 'nature' },
   { id: 'yagmur1', title: 'Yağmur Sesi 1', icon: 'cloud-showers-heavy', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/yagmur-sesi-1.m4a', isLocked: false, category: 'nature' },
   { id: 'yagmur2', title: 'Yağmur Sesi 2', icon: 'cloud-rain', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/yagmur-sesi-2.m4a', isLocked: true, category: 'nature' },
+  { id: 'fan1', title: 'Vantilatör Sesi', icon: 'fan', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/fan-sesi.m4a', isLocked: false, category: 'nature' },
+  { id: 'guguk1', title: 'Guguk Kuşu', icon: 'crow', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/guguk-kusu.m4a', isLocked: false, category: 'nature' },
+  { id: 'sahil1', title: 'Sahil Sesi 1', icon: 'umbrella-beach', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/sahil-sesi-1.m4a', isLocked: false, category: 'nature' },
+  { id: 'sahil2', title: 'Sahil Sesi 2', icon: 'umbrella-beach', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/sahil-sesi-2.m4a', isLocked: true, category: 'nature' },
+  { id: 'tren1', title: 'Tren Sesi', icon: 'train', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/tren-sesi.m4a', isLocked: false, category: 'nature' },
   
   { id: 'ambiyans1', title: 'Ambiyans Sesi', icon: 'headphones', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/ambiyans-music.m4a', isLocked: false, category: 'music' },
   { id: 'hafifmuzik1', title: 'Hafif Müzik', icon: 'music', url: 'https://yousufe.net/apps/yec.sleepsoundsmix/sound/hafif-muzik.m4a', isLocked: false, category: 'music' },
