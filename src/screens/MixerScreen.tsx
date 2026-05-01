@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MixerItem from '../components/MixerItem';
 import useMixerStore from '../store/useMixerStore';
@@ -27,11 +27,22 @@ const MixerScreen = () => {
   const [mixName, setMixName] = useState('');
 
   const activeSoundItems = MOCK_SOUNDS.filter(s => activeSounds[s.id] !== undefined);
-  const dynamicPadding = activeSoundItems.length > 0 ? 180 : 140;
+  const dynamicPadding = activeSoundItems.length > 0
+    ? layout.padding.screenBottomWithPlayer
+    : layout.padding.screenBottomDefault;
 
   const handleSave = () => {
-    saveMix(mixName);
-    setMixName('');
+    // If mixName is empty, the store will handle the default name (Kaydedilen Mix X)
+    const success = saveMix(mixName);
+    if (success) {
+      setMixName('');
+      Alert.alert('Başarılı', 'Mixiniz kaydedildi.');
+    }
+  };
+
+  const handleLoadMix = (id: string) => {
+    loadMix(id);
+    // After loading, we stay in MixerScreen to allow volume adjustments
   };
 
   return (
@@ -150,7 +161,7 @@ const MixerScreen = () => {
                   <View>
                     <Text style={styles.savedMixName}>{mix.name}</Text>
                     <Text style={styles.savedMixMeta}>
-                      {Object.keys(mix.sounds).length} ses
+                      {Array.isArray(mix.sounds) ? mix.sounds.length : Object.keys(mix.sounds || {}).length} ses
                     </Text>
                   </View>
                 </View>
@@ -159,7 +170,7 @@ const MixerScreen = () => {
                 <View style={styles.savedMixActions}>
                   <TouchableOpacity
                     style={styles.loadBtn}
-                    onPress={() => loadMix(mix.id)}
+                    onPress={() => handleLoadMix(mix.id)}
                     activeOpacity={0.75}
                   >
                     <Icon name="play" size={16} color={colors.accent.success} solid />
@@ -187,8 +198,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   scrollContent: {
-    paddingHorizontal: layout.spacing.xl,
-    paddingBottom: 140,
+    paddingHorizontal: layout.padding.screenHorizontal,
+    paddingBottom: layout.padding.screenBottomDefault,
     flexGrow: 1,
   },
   listContainer: {
@@ -196,8 +207,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
   },
-
-  // ── Save Mix ───────────────────────────────────────────────
   saveMixCard: {
     marginBottom: 24,
   },
@@ -224,8 +233,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     fontSize: 13,
   },
-
-  // ── Empty state ────────────────────────────────────────────
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
@@ -265,8 +272,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  // ── Add more / Clear all ───────────────────────────────────
   addMoreSection: {
     alignItems: 'center',
     marginVertical: 20,
@@ -282,8 +287,6 @@ const styles = StyleSheet.create({
   clearAllButton: {
     marginTop: 8,
   },
-
-  // ── Saved Mixes ────────────────────────────────────────────
   savedSection: {
     marginTop: 32,
     gap: layout.spacing.sm,

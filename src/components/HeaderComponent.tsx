@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../theme/colors';
+import { layout } from '../theme/layout';
 
 interface HeaderComponentProps {
   title?: string;
@@ -35,7 +36,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: layout.padding.screenHorizontal,
     paddingTop: 75,
     paddingBottom: 20,
     width: '100%',

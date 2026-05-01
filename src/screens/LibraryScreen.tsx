@@ -7,19 +7,52 @@ import ModeSwitcherComponent from '../components/ModeSwitcherComponent';
 import { MOCK_SOUNDS } from '../data/mockSounds';
 import useMixerStore from '../store/useMixerStore';
 import AppText from '../components/AppText';
+import { layout } from '../theme/layout';
+import { useNetInfo } from '@react-native-community/netinfo';
+import GlassToast from '../components/GlassToast';
 
 const LibraryScreen = () => {
+  const [tick, setTick] = useState(0);
   const activeSounds = useMixerStore((state: any) => state.activeSounds) || {};
+  const adAccess = useMixerStore((state: any) => state.adAccess) || {};
+
+  // Force re-render periodically to update lock states if access expires
+  React.useEffect(() => {
+    const hasActiveAdAccess = Object.values(adAccess).some((a: any) => a.expiresAt > Date.now());
+    if (!hasActiveAdAccess) return;
+
+    const interval = setInterval(() => {
+      setTick(prev => prev + 1);
+    }, 30000); // Check every 30 seconds
+    return () => clearInterval(interval);
+  }, [adAccess]);
+
   const toggleSound = useMixerStore(state => state.toggleSound);
-  const unlockedSoundIds = useMixerStore(state => state.unlockedSoundIds);
-  const unlockSounds = useMixerStore(state => state.unlockSounds);
-  const [activeMode, setActiveMode] = useState<'nature' | 'music'>('nature');
+  const isSoundAccessible = useMixerStore(state => state.isSoundAccessible);
+  const grantAdAccess = useMixerStore(state => state.grantAdAccess);
+  const [activeMode, setActiveMode] = useState<'nature' | 'music' | 'ambience'>('nature');
   const [loadingAdSoundId, setLoadingAdSoundId] = useState<string | null>(null);
+  const [showNetworkToast, setShowNetworkToast] = useState(false);
+
+  const { isConnected } = useNetInfo();
 
   const handleToggleSound = (item: any) => {
-    const isActuallyLocked = item.isLocked && !unlockedSoundIds.includes(item.id);
+    const isActive = activeSounds && activeSounds[item.id] !== undefined;
+    
+    if (isActive) {
+      toggleSound(item.id);
+      return;
+    }
 
-    if (isActuallyLocked) {
+    const hasAccess = isSoundAccessible(item.id);
+
+    if (!hasAccess) {
+      // İnternet kontrolü: Reklam izlemek için internet gerekir
+      if (isConnected === false) {
+        setShowNetworkToast(true);
+        return;
+      }
+
       if (loadingAdSoundId) return;
 
       setLoadingAdSoundId(item.id);
@@ -27,17 +60,14 @@ const LibraryScreen = () => {
       // Rewarded Ad Mock Akışı
       setTimeout(() => {
         setLoadingAdSoundId(null);
-        // %80 başarı ihtimali ile mock ediyoruz
-        const success = Math.random() > 0.2;
+        // %85 başarı ihtimali ile mock ediyoruz
+        const success = Math.random() > 0.15;
 
         if (success) {
-          const remainingLockedIds = MOCK_SOUNDS
-            .filter(s => s.isLocked && !unlockedSoundIds.includes(s.id))
-            .map(s => s.id);
-
-          const idsToUnlock = remainingLockedIds.slice(0, 3); // Her zaman sıradaki ilk 3 sesi açar
-
-          unlockSounds(idsToUnlock);
+          // Yeni model: 1 reklam = tıklanan ses + sıradaki 1 kilitli ses (1 saatlik)
+          grantAdAccess(item.id);
+          // Açıldıktan sonra otomatik aktifleştir
+          toggleSound(item.id);
         } else {
           Alert.alert(
             'Bağlantı Hatası',
@@ -54,14 +84,14 @@ const LibraryScreen = () => {
   };
 
   const renderItem = ({ item }: { item: any }) => {
-    const isActuallyLocked = item.isLocked && !unlockedSoundIds.includes(item.id);
+    const isLocked = !isSoundAccessible(item.id);
     const isActive = activeSounds && activeSounds[item.id] !== undefined;
 
     return (
       <SoundCard
         title={item.title}
         iconName={item.icon}
-        isLocked={isActuallyLocked}
+        isLocked={isLocked}
         isActive={isActive}
         isLoading={loadingAdSoundId === item.id}
         disabled={loadingAdSoundId !== null && loadingAdSoundId !== item.id}
@@ -74,11 +104,14 @@ const LibraryScreen = () => {
 
   const flatListExtraData = useMemo(() => ({
     activeSounds,
-    unlockedSoundIds,
-    loadingAdSoundId
-  }), [activeSounds, unlockedSoundIds, loadingAdSoundId]);
+    isSoundAccessible,
+    loadingAdSoundId,
+    tick
+  }), [activeSounds, isSoundAccessible, loadingAdSoundId, tick]);
 
-  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 180 : 100;
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0
+    ? layout.padding.screenBottomWithPlayer
+    : layout.padding.screenBottomDefault;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -91,7 +124,7 @@ const LibraryScreen = () => {
       
       <ModeSwitcherComponent 
         activeMode={activeMode} 
-        onModeChange={setActiveMode} 
+        onModeChange={(mode: any) => setActiveMode(mode)} 
       />
       
       <FlatList
@@ -107,6 +140,12 @@ const LibraryScreen = () => {
           </View>
         }
       />
+      <GlassToast 
+        visible={showNetworkToast} 
+        message="İnternet bağlantınız yok. Yeni sesler eklemek için lütfen internetinizi kontrol edin." 
+        type="error"
+        onHide={() => setShowNetworkToast(false)} 
+      />
     </SafeAreaView>
   );
 };
@@ -117,8 +156,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   listContent: {
-    paddingHorizontal: 8,
-    paddingBottom: 100,
+    paddingHorizontal: layout.padding.screenHorizontal - 6, // Offset the SoundCard's margin (20-6=14)
+    paddingBottom: layout.padding.screenBottomDefault,
   },
   emptyListContent: {
     flex: 1,

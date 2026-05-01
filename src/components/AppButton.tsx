@@ -25,6 +25,7 @@ interface AppButtonProps extends TouchableOpacityProps {
   style?: StyleProp<ViewStyle>;
   fullWidth?: boolean;
   children?: React.ReactNode;
+  gradientColors?: string[];
 }
 
 const AppButton: React.FC<AppButtonProps> = ({
@@ -37,6 +38,7 @@ const AppButton: React.FC<AppButtonProps> = ({
   fullWidth = true,
   disabled,
   children,
+  gradientColors,
   ...props
 }) => {
   const getContainerStyles = () => {
@@ -70,7 +72,9 @@ const AppButton: React.FC<AppButtonProps> = ({
       case 'gradient':
         return (
           <LinearGradient
-            colors={colors.accent.orangeGradient} // Common gradient for main call to actions
+            colors={gradientColors || colors.accent.orangeGradient} // Common gradient for main call to actions
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
             style={[...getContainerStyles(), disabled && styles.disabled]}
           >
             {innerContent}

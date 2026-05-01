@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Circle } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
@@ -7,6 +8,7 @@ import useMixerStore from '../store/useMixerStore';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import HeaderComponent from '../components/HeaderComponent';
 import ActionButton from '../components/ActionButton';
+import { layout } from '../theme/layout';
 
 // ─── Circular progress ring ───────────────────────────────────────────────────
 const CIRCLE_SIZE = 128;
@@ -218,10 +220,12 @@ const TimerScreen = () => {
     return () => { if (intervalId) clearInterval(intervalId); };
   }, [isTimerRunning, targetTimestamp, timer]);
 
-  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 170 : 100;
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0
+    ? layout.padding.screenBottomWithPlayer
+    : layout.padding.screenBottomDefault;
 
   return (
-    <View style={[styles.container, { paddingBottom: dynamicPadding }]}>
+    <SafeAreaView style={[styles.container, { paddingBottom: dynamicPadding }]}>
       <HeaderComponent
         title="Huzuru Zamanla"
         subtitle="Uykuya dalarken seslerin ne zaman duracağını belirleyin, enerjinizi koruyun."
@@ -241,11 +245,8 @@ const TimerScreen = () => {
         ]}
         onPress={() => {
           if (timer === 0) return;
-          if (isSleepFlowEnabled) {
-            setSleepFlowActive(true);
-          } else {
-            setSleepFlowEnabled(true);
-          }
+          setSleepFlowEnabled(true);
+          setSleepFlowActive(true);
         }}
         disabled={timer === 0}
         activeOpacity={timer > 0 ? 0.75 : 1}
@@ -259,13 +260,9 @@ const TimerScreen = () => {
           styles.sleepFlowLabel,
           timer > 0 && isSleepFlowEnabled && styles.sleepFlowLabelActive,
         ]}>
-          Uyku Akışı Modu
+          Uyku Akışına Geç
         </Text>
-        {/* State indicator dot */}
-        <View style={[
-          styles.sleepFlowDot,
-          timer > 0 && isSleepFlowEnabled && styles.sleepFlowDotActive,
-        ]} />
+
       </TouchableOpacity>
 
       {/* Preset buttons grid */}
@@ -295,7 +292,7 @@ const TimerScreen = () => {
           )}
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -304,25 +301,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 0,
   },
   circleSection: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginVertical: 32,
   },
   presetGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 20,
+    gap: 12,
+    paddingHorizontal: layout.padding.screenHorizontal,
     width: '100%',
+    marginVertical: 24, // Add space between grid and other elements
   },
   actionSection: {
     width: '100%',
     alignItems: 'center',
-    paddingBottom: 8,
+    paddingBottom: 20,
+    marginTop: 10,
   },
   actionBtnWrapper: {
     width: '100%',

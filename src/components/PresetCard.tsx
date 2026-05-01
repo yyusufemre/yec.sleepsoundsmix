@@ -12,11 +12,24 @@ interface PresetCardProps {
   iconName: string;
   isAd?: boolean;
   onPress?: () => void;
+  onLongPress?: () => void;
 }
 
-const PresetCard: React.FC<PresetCardProps> = ({ title, description, iconName, isAd, onPress }) => {
+const PresetCard: React.FC<PresetCardProps> = ({ 
+  title, 
+  description, 
+  iconName, 
+  isAd, 
+  onPress,
+  onLongPress 
+}) => {
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.touchable}>
+    <TouchableOpacity 
+      activeOpacity={0.8} 
+      onPress={onPress} 
+      onLongPress={onLongPress}
+      style={styles.touchable}
+    >
       <GlassCard
         variant={isAd ? 'ad' : 'premium'}
         contentStyle={styles.container}

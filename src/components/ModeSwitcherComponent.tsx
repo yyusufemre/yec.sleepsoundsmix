@@ -4,22 +4,28 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 
 const { width } = Dimensions.get('window');
 const CONTAINER_PADDING = 6;
-const CONTAINER_MARGIN = 16;
-const GAP = 10;
+const CONTAINER_MARGIN = 20;
+const GAP = 8;
 const SWITCHER_WIDTH = width - (CONTAINER_MARGIN * 2);
-const TAB_WIDTH = (SWITCHER_WIDTH - (CONTAINER_PADDING * 2) - GAP) / 2;
+const TAB_WIDTH = (SWITCHER_WIDTH - (CONTAINER_PADDING * 2) - (GAP * 2)) / 3;
 
 interface ModeSwitcherProps {
-  activeMode: 'nature' | 'music';
-  onModeChange: (mode: 'nature' | 'music') => void;
+  activeMode: 'nature' | 'music' | 'ambience';
+  onModeChange: (mode: 'nature' | 'music' | 'ambience') => void;
 }
 
 const ModeSwitcherComponent: React.FC<ModeSwitcherProps> = ({ activeMode, onModeChange }) => {
-  const slideAnim = useRef(new Animated.Value(activeMode === 'nature' ? 0 : 1)).current;
+  const getIndex = (mode: string) => {
+    if (mode === 'nature') return 0;
+    if (mode === 'music') return 1;
+    return 2;
+  };
+
+  const slideAnim = useRef(new Animated.Value(getIndex(activeMode))).current;
 
   useEffect(() => {
     Animated.spring(slideAnim, {
-      toValue: activeMode === 'nature' ? 0 : 1,
+      toValue: getIndex(activeMode),
       useNativeDriver: true,
       friction: 8,
       tension: 50,
@@ -27,18 +33,21 @@ const ModeSwitcherComponent: React.FC<ModeSwitcherProps> = ({ activeMode, onMode
   }, [activeMode]);
 
   const translateX = slideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, TAB_WIDTH + GAP],
+    inputRange: [0, 1, 2],
+    outputRange: [0, TAB_WIDTH + GAP, (TAB_WIDTH + GAP) * 2],
   });
 
   const backgroundColor = slideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['rgba(50, 239, 120, 0.25)', 'rgba(52, 113, 236, 0.25)'],
+    inputRange: [0, 1, 2],
+    outputRange: [
+      'rgba(50, 239, 120, 0.25)', // Nature - Greenish
+      'rgba(52, 113, 236, 0.25)', // Music - Bluish
+      'rgba(236, 52, 113, 0.25)'  // Ambience - Pinkish
+    ],
   });
 
   return (
     <View style={styles.container}>
-      {/* Animated Background Indicator */}
       <Animated.View 
         style={[
           styles.indicator, 
@@ -56,12 +65,11 @@ const ModeSwitcherComponent: React.FC<ModeSwitcherProps> = ({ activeMode, onMode
       >
         <Icon 
           name="leaf" 
-          size={24} 
+          size={20} 
           color={activeMode === 'nature' ? '#FFFFFF' : 'rgba(255,255,255,0.4)'} 
           solid 
         />
-        <Text style={[styles.title, activeMode !== 'nature' && styles.inactiveText]}>Doğal Sesler</Text>
-        <Text style={styles.subtitle}>Yağmur, rüzgar ve orman fısıltıları.</Text>
+        <Text style={[styles.title, activeMode !== 'nature' && styles.inactiveText]}>Doğa</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
@@ -71,12 +79,25 @@ const ModeSwitcherComponent: React.FC<ModeSwitcherProps> = ({ activeMode, onMode
       >
         <Icon 
           name="music" 
-          size={24} 
+          size={20} 
           color={activeMode === 'music' ? '#FFFFFF' : 'rgba(255,255,255,0.4)'} 
           solid 
         />
-        <Text style={[styles.title, activeMode !== 'music' && styles.inactiveText]}>Rahatlatıcı Ses</Text>
-        <Text style={styles.subtitle}>Piyano, kase ve derin frekanslar.</Text>
+        <Text style={[styles.title, activeMode !== 'music' && styles.inactiveText]}>Müzik</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.tab} 
+        onPress={() => onModeChange('ambience')}
+        activeOpacity={0.8}
+      >
+        <Icon 
+          name="couch" 
+          size={20} 
+          color={activeMode === 'ambience' ? '#FFFFFF' : 'rgba(255,255,255,0.4)'} 
+          solid 
+        />
+        <Text style={[styles.title, activeMode !== 'ambience' && styles.inactiveText]}>Ortam</Text>
       </TouchableOpacity>
     </View>
   );
@@ -101,38 +122,29 @@ const styles = StyleSheet.create({
     left: CONTAINER_PADDING,
     width: TAB_WIDTH,
     height: '100%',
-    borderRadius: 20,
-    backgroundColor: 'rgba(50,239,120,0.3)',
+    borderRadius: 18,
     bottom: CONTAINER_PADDING,
   },
   tab: {
     flex: 1,
-    borderRadius: 20,
-    paddingVertical: 24,
-    paddingHorizontal: 10,
+    borderRadius: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 17,
+    fontSize: 14,
     fontFamily: 'Inter-Bold',
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 6,
     textAlign: 'center',
   },
   inactiveText: {
     opacity: 0.6,
   },
-  subtitle: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontFamily: 'Inter-Regular',
-    opacity: 0.4,
-    marginTop: 6,
-    textAlign: 'center',
-  }
 });
 
 export default ModeSwitcherComponent;

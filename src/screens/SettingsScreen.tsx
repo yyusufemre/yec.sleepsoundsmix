@@ -9,17 +9,50 @@ import AppText from '../components/AppText';
 import AppButton from '../components/AppButton';
 import YecLogo from '../components/YecLogo';
 import { colors } from '../theme/colors';
+import { layout } from '../theme/layout';
 import useMixerStore from '../store/useMixerStore';
+import DeveloperInfoModal from '../components/DeveloperInfoModal';
+import InAppReview from 'react-native-in-app-review';
 
 const pkg = require('../../package.json');
 
 
 const SettingsScreen = () => {
   const activeSounds = useMixerStore((state: any) => state.activeSounds);
-  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 180 : 100;
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0
+    ? layout.padding.screenBottomWithPlayer
+    : layout.padding.screenBottomDefault;
+
+  const [showDevModal, setShowDevModal] = React.useState(false);
+  const hasRated = useMixerStore((state: any) => state.hasRated);
+  const setHasRated = useMixerStore((state: any) => state.setHasRated);
 
   const handleEmail = () => {
     Linking.openURL('mailto:info@yusufemre.com');
+  };
+
+  const handleRate = () => {
+    const storeUrl = 'https://play.google.com/store/apps/details?id=com.yec.sleepsoundsmix';
+    
+    try {
+      if (!hasRated && InAppReview && InAppReview.isAvailable()) {
+        InAppReview.RequestInAppReview()
+          .then((hasFlowFinishedSuccessfully) => {
+            if (hasFlowFinishedSuccessfully) {
+              setHasRated(true);
+            }
+          })
+          .catch((error) => {
+            console.log('[InAppReview] Error:', error);
+            Linking.openURL(storeUrl);
+          });
+      } else {
+        Linking.openURL(storeUrl);
+      }
+    } catch (e) {
+      console.log('[handleRate] Error:', e);
+      Linking.openURL(storeUrl);
+    }
   };
 
   return (
@@ -32,7 +65,7 @@ const SettingsScreen = () => {
       <View style={[styles.mainContent, { paddingBottom: dynamicPadding }]}>
         <View style={styles.cardsContainer}>
           {/* Nasıl Kullanılır - No Background */}
-          <GlassCard contentStyle={styles.glassCardContent}>
+          <GlassCard noBackground contentStyle={styles.glassCardContent}>
             <View style={styles.cardHeader}>
               <Icon name="circle-question" size={20} color={colors.text.muted} solid style={styles.cardIcon} />
               <View style={styles.cardTextContent}>
@@ -72,10 +105,12 @@ const SettingsScreen = () => {
               </View>
             </View>
             
-            <AppButton
+            <AppButton 
               variant="gradient"
               size="medium"
+              gradientColors={colors.accent.titleGradient}
               style={styles.rateButton}
+              onPress={handleRate}
             >
               <View style={styles.starsRow}>
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -91,13 +126,22 @@ const SettingsScreen = () => {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <View style={styles.logoContainer}>
+          <TouchableOpacity 
+            style={styles.logoContainer} 
+            onPress={() => setShowDevModal(true)}
+            activeOpacity={0.7}
+          >
             <YecLogo fill={colors.background.logo} />
-          </View>
+          </TouchableOpacity>
           <AppText variant="tiny" color="inactive" style={styles.versionText}>Sürüm v{pkg.version}</AppText>
           <AppText variant="tiny" color="inactive" style={styles.footerSubtext}>hey!</AppText>
         </View>
       </View>
+
+      <DeveloperInfoModal 
+        isVisible={showDevModal} 
+        onClose={() => setShowDevModal(false)} 
+      />
     </SafeAreaView>
   );
 };
@@ -109,9 +153,9 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: layout.padding.screenHorizontal,
     justifyContent: 'space-between',
-    paddingBottom: 100, // Space for tab bar
+    paddingBottom: layout.padding.screenBottomDefault,
   },
   cardsContainer: {
     gap: 12,

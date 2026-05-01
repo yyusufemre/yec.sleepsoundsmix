@@ -25,5 +25,8 @@ export const layout = {
     cardSmall: 12,
     button: 16,
     buttonSmall: 8,
+    // Bottom padding for screens — accounts for tab bar (+ mini player when active)
+    screenBottomDefault: 110,   // tab bar only
+    screenBottomWithPlayer: 180, // tab bar + mini player
   }
 };

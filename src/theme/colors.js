@@ -15,6 +15,7 @@ export const colors = {
     danger: '#EF324B',
     orange: '#EF720D', // Used in Settings & Modals
     orangeGradient: ['#EF720D', '#E05D00'], // Used in Call to Action buttons
+    titleGradient: ['#91B2DF', '#4C1E9A'], // Blue-Purple title gradient
     star: '#FFC900', // Settings rating
   },
   glass: {

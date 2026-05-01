@@ -1,81 +1,104 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../theme/colors';
 import HeaderComponent from '../components/HeaderComponent';
 import PresetCard from '../components/PresetCard';
 import useMixerStore from '../store/useMixerStore';
+import { layout } from '../theme/layout';
+import AppText from '../components/AppText';
 
 const EXAMPLES = [
   {
-    id: '1',
+    id: 'e1',
     title: 'Büyülü Orman',
     description: 'Hafif rüzgarla hışırdayan yapraklar ve uzaklardan gelen kuş cıvıltılarıyla kendinizi doğanın kucağında hissedin.',
     iconName: 'tree',
     isAd: false,
   },
   {
-    id: '2',
+    id: 'e2',
     title: 'Fırtınalı Gece',
     description: 'Gök gürültüsü ve şiddetli yağmurun huzur veren ritmiyle derin uykuya dalın ve dış dünyadan kopun.',
     iconName: 'cloud-bolt',
     isAd: true,
   },
   {
-    id: '3',
+    id: 'e3',
     title: 'Deniz Kıyısı',
     description: 'Dalgaların kıyıya vurduğu o eşsiz ses ve martı çığlıklarıyla kumsalda huzurlu bir akşam yaşayın.',
     iconName: 'water',
     isAd: false,
   },
-  {
-    id: '4',
-    title: 'Şehir Yağmuru',
-    description: 'Pencereye vuran yağmur damlaları ve uzaktan gelen loş şehir uğultusuyla melankolik ve rahatlatıcı bir atmosfer.',
-    iconName: 'cloud-showers-heavy',
-    isAd: false,
-  },
-  {
-    id: '5',
-    title: 'Kamp Ateşi',
-    description: 'Çıtırtıyla yanan odunların sıcaklığı ve gece böceklerinin şarkısı eşliğinde yıldızların altında bir uyku.',
-    iconName: 'fire',
-    isAd: false,
-  },
-  {
-    id: '6',
-    title: 'Derin Uzay',
-    description: 'Sonsuzluğun huzur veren düşük frekanslı uğultusuyla zihninizi boşaltın ve evrenin derinliklerine yolculuk yapın.',
-    iconName: 'user-astronaut',
-    isAd: false,
-  }
 ];
 
 const PresetsScreen = () => {
   const activeSounds = useMixerStore((state: any) => state.activeSounds);
-  const dynamicPadding = Object.keys(activeSounds || {}).length > 0 ? 180 : 110;
+  const savedMixes = useMixerStore((state: any) => state.savedMixes);
+  const loadMix = useMixerStore((state: any) => state.loadMix);
+  const deleteSavedMix = useMixerStore((state: any) => state.deleteSavedMix);
+
+  const dynamicPadding = Object.keys(activeSounds || {}).length > 0
+    ? layout.padding.screenBottomWithPlayer
+    : layout.padding.screenBottomDefault;
+
+  const handleLongPress = (id: string, name: string) => {
+    Alert.alert(
+      'Mixi Sil',
+      `"${name}" isimli mixi silmek istediğinize emin misiniz?`,
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        { text: 'Sil', style: 'destructive', onPress: () => deleteSavedMix(id) }
+      ]
+    );
+  };
+
+  const getSoundCount = (mix: any) => {
+    if (!mix.sounds) return 0;
+    if (Array.isArray(mix.sounds)) return mix.sounds.length;
+    return Object.keys(mix.sounds).length;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent
         title="Hazır Yolculuklar"
-        subtitle="Uzmanlarımız tarafından hazırlanan, sizi derin uykuya taşıyacak özel ses kombinasyonlarını keşfedin."
+        subtitle="Uzmanlarımız tarafından hazırlanan veya sizin kaydettiğiniz özel ses kombinasyonlarını keşfedin."
       />
       <ScrollView
         style={styles.content}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: dynamicPadding }]}
         showsVerticalScrollIndicator={false}
       >
-        {EXAMPLES.map((item) => (
-          <PresetCard
-            key={item.id}
-            title={item.title}
-            description={item.description}
-            iconName={item.iconName}
-            isAd={item.isAd}
-            onPress={() => console.log('Playing preset:', item.title)}
-          />
-        ))}
+        {savedMixes.length > 0 && (
+          <View style={styles.section}>
+            <AppText variant="h2" color="primary" style={styles.sectionTitle}>Sizin Karışımlarınız</AppText>
+            {savedMixes.map((mix: any) => (
+              <PresetCard
+                key={mix.id}
+                title={mix.name}
+                description={`${getSoundCount(mix)} ses`}
+                iconName="music"
+                isAd={false}
+                onPress={() => loadMix(mix.id)}
+                onLongPress={() => handleLongPress(mix.id, mix.name)}
+              />
+            ))}
+          </View>
+        )}
+
+        <View style={styles.section}>
+          <AppText variant="h2" color="primary" style={styles.sectionTitle}>Önerilenler</AppText>
+          {EXAMPLES.map((item) => (
+            <PresetCard
+              key={item.id}
+              title={item.title}
+              description={item.description}
+              iconName={item.iconName}
+              isAd={item.isAd}
+              onPress={() => console.log('Playing preset:', item.title)}
+            />
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -90,9 +113,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: layout.padding.screenHorizontal,
     paddingTop: 10,
-    paddingBottom: 110, // Space for tab bar
+    paddingBottom: layout.padding.screenBottomDefault,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    marginBottom: 16,
+    marginLeft: 4,
   }
 });
 

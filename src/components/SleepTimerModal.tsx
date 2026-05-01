@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, BackHandler } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import GlassBlur from './GlassBlur';
@@ -11,34 +11,55 @@ const SleepTimerModal = () => {
   const showSleepModal = useMixerStore(state => state.showSleepModal);
   const setShowSleepModal = useMixerStore(state => state.setShowSleepModal);
   const [countdown, setCountdown] = useState(30);
+  const exitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didExitRef = useRef(false);
 
+  // 1. Manage countdown timer
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
+    
     if (showSleepModal) {
       setCountdown(30);
+      didExitRef.current = false;
+      
       interval = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            const { clearMix } = useMixerStore.getState();
-            clearMix();
-            BackHandler.exitApp();
-            return 0;
-          }
-          return prev - 1;
-        });
+        setCountdown((prev) => Math.max(prev - 1, 0));
       }, 1000);
     }
+    
     return () => {
       if (interval) clearInterval(interval);
+      // We DON'T clear exitTimeoutRef here because we want it to fire 
+      // even after the modal starts hiding (which triggers this cleanup).
     };
   }, [showSleepModal]);
 
-  if (!showSleepModal) return null;
+  // 2. Handle side effects when countdown reaches 0
+  useEffect(() => {
+    if (!showSleepModal || countdown > 0 || didExitRef.current) return;
+
+    didExitRef.current = true;
+
+    // Get actions directly from store to ensure we are not in a render hook context
+    const { clearMix, setShowSleepModal: hideModal } = useMixerStore.getState();
+    
+    // Clear the mix and close app
+    clearMix();
+    hideModal(false);
+    
+    // Use a small delay for BackHandler to ensure state updates are flushed
+    exitTimeoutRef.current = setTimeout(() => {
+      BackHandler.exitApp();
+    }, 100);
+  }, [showSleepModal, countdown]);
 
   const handleStay = () => {
+    if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+    didExitRef.current = false;
     setShowSleepModal(false);
   };
+
+  if (!showSleepModal) return null;
 
   return (
     <Modal transparent animationType="fade" visible={showSleepModal}>

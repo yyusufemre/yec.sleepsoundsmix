@@ -58,9 +58,10 @@ const GlobalAudioPlayer = () => {
           }
         } else {
           try {
-            await TrackPlayer.stop(); // Ses yoksa bildirimi tamamen yokediyoruz
+            // No active sounds: completely reset to destroy the notification card
+            await TrackPlayer.reset();
           } catch {
-            // Sessizce geç. RemoteStop zaten reset atmış olabilir.
+            // Silent catch
           }
         }
       } catch (error) {
