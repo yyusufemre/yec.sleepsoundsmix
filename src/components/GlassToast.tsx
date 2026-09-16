@@ -1,3 +1,5 @@
+import useReducedMotion from '../hooks/useReducedMotion';
+import {component, spacing, fontSize, fontFamily} from '../theme/tokens';
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -20,6 +22,7 @@ const GlassToast: React.FC<GlassToastProps> = ({
   duration = 3000,
   type = 'info'
 }) => {
+  const reducedMotion = useReducedMotion();
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
 
@@ -27,30 +30,30 @@ const GlassToast: React.FC<GlassToastProps> = ({
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 0,
-        duration: 300,
+        duration: reducedMotion ? 0 : 300,
         useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: 20,
-        duration: 300,
+        duration: reducedMotion ? 0 : 300,
         useNativeDriver: true,
       }),
     ]).start(() => {
       onHide();
     });
-  }, [opacity, translateY, onHide]);
+  }, [opacity, translateY, onHide, reducedMotion]);
 
   useEffect(() => {
     if (visible) {
       Animated.parallel([
         Animated.timing(opacity, {
           toValue: 1,
-          duration: 300,
+          duration: reducedMotion ? 0 : 300,
           useNativeDriver: true,
         }),
         Animated.timing(translateY, {
           toValue: 0,
-          duration: 300,
+          duration: reducedMotion ? 0 : 300,
           useNativeDriver: true,
         }),
       ]).start();
@@ -63,7 +66,7 @@ const GlassToast: React.FC<GlassToastProps> = ({
     } else {
       hide();
     }
-  }, [visible, duration, hide, opacity, translateY]);
+  }, [visible, duration, hide, opacity, translateY, reducedMotion]);
 
   if (!visible) return null;
 
@@ -84,17 +87,19 @@ const GlassToast: React.FC<GlassToastProps> = ({
   };
 
   return (
-    <Animated.View 
+    <Animated.View
+      accessibilityRole="alert"
+      accessibilityLiveRegion="polite"
       style={[
-        styles.container, 
+        styles.container,
         { opacity, transform: [{ translateY }] }
       ]}
     >
       <View style={styles.content}>
-        <GlassBlur 
-          style={StyleSheet.absoluteFill} 
-          blurAmount={12} 
-          fallbackColor="rgba(25,32,43,0.9)" 
+        <GlassBlur
+          style={StyleSheet.absoluteFill}
+          blurAmount={12}
+          fallbackColor="rgba(25,32,43,0.9)"
         />
         <View style={styles.inner}>
           <Icon name={getIcon()} size={16} color={getIconColor()} solid />
@@ -108,7 +113,7 @@ const GlassToast: React.FC<GlassToastProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 100, // Above the tab bar
+    bottom: layout.spacing.lg, // The scene already ends above the complete bottom dock
     left: layout.spacing.xl,
     right: layout.spacing.xl,
     zIndex: 9999,
@@ -116,7 +121,7 @@ const styles = StyleSheet.create({
   },
   content: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: component.modalMaxWidth,
     borderRadius: layout.radius.pill,
     overflow: 'hidden',
     borderWidth: 1,
@@ -125,14 +130,14 @@ const styles = StyleSheet.create({
   inner: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    gap: 12,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    gap: spacing.md,
   },
   text: {
     color: colors.text.primary,
-    fontSize: 13,
-    fontFamily: 'Inter-Medium',
+    fontSize: fontSize.caption,
+    fontFamily: fontFamily.medium,
     flex: 1,
   },
 });

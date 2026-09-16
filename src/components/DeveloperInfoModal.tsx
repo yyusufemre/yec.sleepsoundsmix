@@ -7,48 +7,60 @@ import {
   TouchableOpacity,
   Linking,
   TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome6';
-import GlassBlur from './GlassBlur';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import YecLogo from './YecLogo';
-import { colors } from '../theme/colors';
-import { layout } from '../theme/layout';
+import GlassBlur from './GlassBlur';
+import { useTranslation } from 'react-i18next';
+import { trackEvent } from '../services/AnalyticsService';
 
 interface DeveloperInfoModalProps {
-  isVisible: boolean;
+  isVisible?: boolean;
+  visible?: boolean;
   onClose: () => void;
 }
 
-const DeveloperInfoModal: React.FC<DeveloperInfoModalProps> = ({ isVisible, onClose }) => {
+export const DeveloperInfoModal: React.FC<DeveloperInfoModalProps> = ({
+  isVisible,
+  visible,
+  onClose,
+}) => {
+  const isModalVisible = visible !== undefined ? visible : !!isVisible;
+  const { t } = useTranslation();
+
   const handleOpenLink = (url: string) => {
-    Linking.openURL(url).catch((err) => console.error("Couldn't load page", err));
+    trackEvent('developer_link_clicked', { target: 'website' });
+    Linking.openURL(url).catch((err) => console.error("Sayfa açılamadı", err));
   };
 
   const handleEmail = () => {
-    Linking.openURL('mailto:cibiroglu@gmail.com').catch((err) => console.error("Couldn't open mail", err));
+    trackEvent('developer_link_clicked', { target: 'email' });
+    Linking.openURL('mailto:cibiroglu@gmail.com').catch((err) => console.error("E-posta açılamadı", err));
   };
 
   const handlePlayStore = () => {
-    Linking.openURL('https://play.google.com/store/apps/dev?id=6882853239344070177').catch((err) => console.error("Couldn't open Play Store", err));
+    trackEvent('developer_link_clicked', { target: 'google_play' });
+    Linking.openURL('https://play.google.com/store/apps/dev?id=6882853239344070177').catch((err) => console.error("Play Store açılamadı", err));
   };
 
   return (
     <Modal
-      visible={isVisible}
+      visible={isModalVisible}
       transparent
       animationType="fade"
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
-          <GlassBlur style={StyleSheet.absoluteFill} blurAmount={12} fallbackColor="rgba(0,0,0,0.85)" />
-          
+          <GlassBlur blurAmount={25} style={StyleSheet.absoluteFill} />
+
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               {/* Header Info Section */}
               <View style={styles.headerInfo}>
                 <View style={styles.logoContainer}>
-                  <YecLogo width={76} height={51} fill="#45556F" />
+                  <YecLogo width={72} height={48} fill="#C5AD92" />
                 </View>
 
                 <View style={styles.details}>
@@ -61,31 +73,33 @@ const DeveloperInfoModal: React.FC<DeveloperInfoModalProps> = ({ isVisible, onCl
                   </TouchableOpacity>
 
                   <TouchableOpacity style={styles.mailRow} onPress={handleEmail}>
-                    <Icon name="envelope" size={12} color="#45556F" style={styles.mailIcon} />
+                    <Ionicons name="mail" size={13} color="#C5AD92" style={styles.mailIcon} />
                     <Text style={styles.mailText}>cibiroglu@gmail.com</Text>
                   </TouchableOpacity>
                 </View>
               </View>
 
-              {/* Divider */}
-              <View style={styles.divider} />
+              {/* Other Apps Section - Only show Play Store link on Android */}
+              {Platform.OS === 'android' && (
+                <>
+                  <View style={styles.divider} />
+                  <Text style={styles.sectionTitle}>{t('settings.other_apps')}</Text>
 
-              {/* Other Apps Section */}
-              <Text style={styles.sectionTitle}>Diğer Uygulamalar</Text>
-
-              <TouchableOpacity
-                style={styles.playButton}
-                onPress={handlePlayStore}
-                activeOpacity={0.8}
-              >
-                <View style={styles.playButtonContent}>
-                  <Icon name="google-play" size={24} color="#FFFFFF" />
-                  <View style={styles.playTextContainer}>
-                    <Text style={styles.getItOn}>GET IT ON</Text>
-                    <Text style={styles.googlePlay}>Google Play</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.playButton}
+                    onPress={handlePlayStore}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.playButtonContent}>
+                      <Ionicons name="logo-google-playstore" size={24} color="#FFFFFF" />
+                      <View style={styles.playTextContainer}>
+                        <Text style={styles.getItOn}>{t('settings.get_it_on')}</Text>
+                        <Text style={styles.googlePlay}>Google Play</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -105,17 +119,22 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: '#1F232F',
+    backgroundColor: '#151320',
     borderRadius: 24,
-    padding: 30,
+    padding: 24,
     alignItems: 'center',
-    borderWidth: 0,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 10,
   },
   headerInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 20,
+    gap: 16,
     width: '100%',
   },
   logoContainer: {
@@ -127,17 +146,15 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    color: '#45556F',
+    color: 'rgba(255,255,255,0.6)',
     fontSize: 13,
-    fontFamily: 'Inter-Regular',
+    fontWeight: '500',
   },
   webText: {
-    color: '#63738D',
+    color: '#C5AD92',
     fontSize: 16,
-    fontFamily: 'Inter-Regular',
   },
   webBold: {
-    fontFamily: 'Inter-Bold',
     fontWeight: 'bold',
   },
   mailRow: {
@@ -150,31 +167,30 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   mailText: {
-    color: '#45556F',
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 13,
   },
   divider: {
     width: '100%',
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     marginVertical: 20,
   },
   sectionTitle: {
-    color: '#63738D',
+    color: 'rgba(255,255,255,0.5)',
     fontSize: 13,
-    fontFamily: 'Inter-Regular',
-    opacity: 0.5,
-    marginBottom: 16,
+    fontWeight: '500',
+    marginBottom: 14,
     textAlign: 'center',
   },
   playButton: {
     width: '100%',
     backgroundColor: '#000000',
-    borderRadius: 12,
+    borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    opacity: 0.9, // Matching the translucent feel in screenshot
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   playButtonContent: {
     flexDirection: 'row',
@@ -186,15 +202,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   getItOn: {
-    color: '#FFFFFF',
+    color: 'rgba(255, 255, 255, 0.8)',
     fontSize: 10,
-    fontFamily: 'Inter-Medium',
-    opacity: 0.8,
+    fontWeight: '500',
   },
   googlePlay: {
     color: '#FFFFFF',
     fontSize: 18,
-    fontFamily: 'Inter-Bold',
     fontWeight: 'bold',
   },
 });

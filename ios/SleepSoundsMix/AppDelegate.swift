@@ -2,6 +2,9 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import AVFoundation
+import RNBootSplash
+import FirebaseCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,6 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    // Set up AVAudioSession for background playback
+    do {
+      let audioSession = AVAudioSession.sharedInstance()
+      try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+      try audioSession.setActive(true)
+    } catch {
+      print("Failed to set audio session category: \(error)")
+    }
+
+    FirebaseApp.configure()
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -44,5 +58,11 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 #else
     Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
+  }
+
+  override func customize(_ rootView: RCTRootView!) {
+    super.customize(rootView)
+    rootView.backgroundColor = UIColor(red: 13.0 / 255.0, green: 19.0 / 255.0, blue: 25.0 / 255.0, alpha: 1.0)
+    RNBootSplash.initWithStoryboard("BootSplash", rootView: rootView)
   }
 }

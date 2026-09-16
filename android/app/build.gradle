@@ -1,6 +1,8 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.crashlytics"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -72,6 +74,27 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+import groovy.json.JsonSlurper
+
+def getPackageVersion() {
+    def inputFile = new File(projectDir, "../../package.json")
+    def packageJson = new JsonSlurper().parseText(inputFile.text)
+    return packageJson.version
+}
+
+def getCustomVersionCode() {
+    def codeProp = project.hasProperty('MYAPP_VERSION_CODE') ? project.property('MYAPP_VERSION_CODE') : "1"
+    try {
+        def val = Integer.parseInt(codeProp.toString())
+        if (val <= 0) {
+            throw new GradleException("ERROR: MYAPP_VERSION_CODE must be a positive integer (greater than 0). Provided: " + codeProp)
+        }
+        return val
+    } catch (NumberFormatException e) {
+        throw new GradleException("ERROR: MYAPP_VERSION_CODE must be a valid integer. Provided: " + codeProp)
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -82,8 +105,8 @@ android {
         applicationId "com.yec.sleepsoundsmix"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode getCustomVersionCode()
+        versionName getPackageVersion()
     }
     signingConfigs {
         debug {
@@ -92,15 +115,30 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // Enforce signing checks for release builds
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                signingConfig signingConfigs.release
+            } else {
+                gradle.taskGraph.whenReady { taskGraph ->
+                    if (taskGraph.allTasks.any { it.name.contains("Release") }) {
+                        throw new GradleException("ERROR: MYAPP_RELEASE_* signing properties are missing in gradle.properties! Please configure them for release builds.")
+                    }
+                }
+            }
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -110,6 +148,10 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-crashlytics'
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

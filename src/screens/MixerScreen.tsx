@@ -1,19 +1,28 @@
+import { spacing, fontSize, fontFamily } from '../theme/tokens';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import AppScreen, { ScreenScrollView } from '../layout/AppScreen';
 import MixerItem from '../components/MixerItem';
 import useMixerStore from '../store/useMixerStore';
 import HeaderComponent from '../components/HeaderComponent';
-import { MOCK_SOUNDS } from '../data/mockSounds';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { useNavigation } from '@react-navigation/native';
 import ActionButton from '../components/ActionButton';
-import GlassCard from '../components/GlassCard';
-import GlassBlur from '../components/GlassBlur';
+import SaveMixForm from '../components/SaveMixForm';
+import SavedMixRow from '../components/SavedMixRow';
+import EmptyState from '../components/EmptyState';
+import IconButton from '../components/IconButton';
 import { colors } from '../theme/colors';
 import { layout } from '../theme/layout';
+import BannerAdView from '../components/BannerAdView';
+import { useTranslation } from 'react-i18next';
+import { getLocalizedSoundTitle } from '../utils/soundUtils';
+import { useNetInfo } from '@react-native-community/netinfo';
+import RewardedAdManager from '../services/RewardedAdManager';
+import GlassToast from '../components/GlassToast';
 
 const MixerScreen = () => {
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation();
   const activeSounds = useMixerStore((state: any) => state.activeSounds) || {};
   const toggleSound = useMixerStore((state: any) => state.toggleSound);
@@ -23,326 +32,269 @@ const MixerScreen = () => {
   const saveMix = useMixerStore((state: any) => state.saveMix);
   const loadMix = useMixerStore((state: any) => state.loadMix);
   const deleteSavedMix = useMixerStore((state: any) => state.deleteSavedMix);
+  const activePresetId = useMixerStore((state: any) => state.activePresetId);
+  const activeMixId = useMixerStore((state: any) => state.activeMixId);
+  const sounds = useMixerStore((state: any) => state.sounds) || [];
+  const metronomBpm = useMixerStore(
+    (state: any) => state.metronomBpm,
+  ) as number;
+  const setMetronomBpm = useMixerStore((state: any) => state.setMetronomBpm);
+  const isSoundAccessible = useMixerStore(
+    (state: any) => state.isSoundAccessible,
+  );
+  const grantMultipleAdAccess = useMixerStore(
+    (state: any) => state.grantMultipleAdAccess,
+  );
 
   const [mixName, setMixName] = useState('');
+  const [loadingAdMixId, setLoadingAdMixId] = useState<string | null>(null);
+  const [showNetworkToast, setShowNetworkToast] = useState(false);
+  const { isConnected } = useNetInfo();
 
-  const activeSoundItems = MOCK_SOUNDS.filter(s => activeSounds[s.id] !== undefined);
-  const dynamicPadding = activeSoundItems.length > 0
-    ? layout.padding.screenBottomWithPlayer
-    : layout.padding.screenBottomDefault;
+  const activeSoundItems = (sounds || []).filter(
+    (s: any) => activeSounds[s.id] !== undefined,
+  );
 
   const handleSave = () => {
-    // If mixName is empty, the store will handle the default name (Kaydedilen Mix X)
+    // If mixName is empty, the store will handle the default name using the i18n key
     const success = saveMix(mixName);
     if (success) {
       setMixName('');
-      Alert.alert('Başarılı', 'Mixiniz kaydedildi.');
+      Alert.alert(t('common.success'), t('mixer.mix_saved_success'));
     }
   };
 
-  const handleLoadMix = (id: string) => {
+  const handleLoadMix = async (id: string) => {
+    const mix = savedMixes.find((m: any) => m.id === id);
+    if (!mix) return;
+
+    // Find locked and currently inaccessible sounds in the mix
+    const inaccessibleIds: string[] = [];
+
+    const checkSoundAccess = (soundId: string) => {
+      if (!isSoundAccessible(soundId)) {
+        inaccessibleIds.push(soundId);
+      }
+    };
+
+    if (Array.isArray(mix.sounds)) {
+      mix.sounds.forEach((s: any) => checkSoundAccess(s.id));
+    } else if (mix.sounds && typeof mix.sounds === 'object') {
+      Object.keys(mix.sounds).forEach(checkSoundAccess);
+    }
+
+    if (inaccessibleIds.length > 0) {
+      if (isConnected === false) {
+        setShowNetworkToast(true);
+        return;
+      }
+
+      if (loadingAdMixId) return;
+      setLoadingAdMixId(id);
+
+      try {
+        const isReady =
+          RewardedAdManager.isReady() ||
+          (await RewardedAdManager.waitUntilReady());
+        if (!isReady) {
+          if (RewardedAdManager.getLastError()) {
+            Alert.alert(t('common.error'), t('library.ad_error_msg'));
+            return;
+          }
+          Alert.alert(
+            t('library.ad_not_ready_title'),
+            t('library.ad_not_ready_msg'),
+          );
+          return;
+        }
+
+        await RewardedAdManager.show(() => {
+          grantMultipleAdAccess(inaccessibleIds);
+          loadMix(id);
+        });
+      } catch (error) {
+        console.log('[AdMob] Show error while loading mix:', error);
+        Alert.alert(t('common.error'), t('library.ad_error_msg'));
+      } finally {
+        setLoadingAdMixId(null);
+      }
+      return;
+    }
+
     loadMix(id);
-    // After loading, we stay in MixerScreen to allow volume adjustments
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <HeaderComponent
-        title={activeSoundItems.length > 0 ? 'Senfonini Yönet' : 'Kendi Senfonini Oluştur'}
-        subtitle={activeSoundItems.length > 0
-          ? 'Seçtiğin seslerin dengesini ayarla ve sana özel mükemmel uyku ortamını yönet.'
-          : 'Henüz bir ses seçmedin. Rahatlamak için kütüphaneden beğendiğin sesleri eklemeye başla.'
-        }
-      />
+  let displayName = null;
+  if (activePresetId) {
+    displayName = t(`presets.items.${activePresetId}.title`);
+  } else if (activeMixId) {
+    const mix = savedMixes.find((m: any) => m.id === activeMixId);
+    if (mix) displayName = mix.name;
+  }
 
-      <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: dynamicPadding }]}
+  return (
+    <AppScreen>
+      <ScreenScrollView
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <HeaderComponent
+          inset={false}
+          title={
+            activeSoundItems.length > 0
+              ? t('mixer.header_title_active')
+              : t('mixer.header_title_empty')
+          }
+          subtitle={
+            activeSoundItems.length > 0
+              ? t('mixer.header_subtitle_active')
+              : t('mixer.header_subtitle_empty')
+          }
+        />
+
         {activeSoundItems.length > 0 ? (
           <>
+            {displayName && (
+              <View style={styles.presetBadge}>
+                <Icon
+                  name="wand-magic-sparkles"
+                  size={12}
+                  color={colors.accent.primary}
+                  solid
+                />
+                <Text style={styles.presetNameText}>
+                  {t('mixer.mix_badge', { name: displayName })}
+                </Text>
+              </View>
+            )}
+
             {/* Active sound list */}
             <View style={styles.listContainer}>
-              {activeSoundItems.map(sound => (
+              {activeSoundItems.map((sound: any) => (
                 <MixerItem
                   key={sound.id}
-                  title={sound.title}
+                  id={sound.id}
+                  title={getLocalizedSoundTitle(sound, i18n.language, t)}
                   iconName={sound.icon}
                   volume={activeSounds[sound.id]}
                   onVolumeChange={(val: number) => setVolume(sound.id, val)}
                   onRemove={() => toggleSound(sound.id)}
+                  isMetronome={!!sound.isMetronome}
+                  bpm={sound.isMetronome ? metronomBpm : undefined}
+                  onBpmChange={sound.isMetronome ? setMetronomBpm : undefined}
                 />
               ))}
             </View>
 
-            {/* Save Mix — GlassCard row */}
-            <GlassCard
-              variant="normal"
-              style={styles.saveMixCard}
-              contentStyle={styles.saveMixContent}
-            >
-              <Icon name="floppy-disk" size={15} color="rgba(255, 255, 255, 0.5)" solid />
-              <TextInput
-                style={styles.saveInput}
-                placeholder="Mix adı ver..."
-                placeholderTextColor={colors.text.muted}
-                value={mixName}
-                onChangeText={setMixName}
-                returnKeyType="done"
-                onSubmitEditing={handleSave}
-              />
-              <TouchableOpacity
-                style={styles.saveBtn}
-                onPress={handleSave}
-                activeOpacity={0.75}
-              >
-                <Text style={styles.saveBtnText}>Kaydet</Text>
-              </TouchableOpacity>
-            </GlassCard>
-
-            {/* Add more */}
+            <SaveMixForm
+              value={mixName}
+              onChangeText={setMixName}
+              onSave={handleSave}
+            />
             <View style={styles.addMoreSection}>
-              <TouchableOpacity
-                style={styles.plusButton}
-                activeOpacity={0.8}
+              <IconButton
+                name="plus"
+                size="large"
+                variant="solid"
+                accessibilityLabel={t('mixer.add_sounds_msg')}
                 onPress={() => navigation.navigate('Library' as never)}
-              >
-                <Icon name="plus" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
+              />
             </View>
-
             {/* Clear all */}
             <ActionButton
-              title={`Tüm Sesleri Kaldır (${activeSoundItems.length})`}
+              title={t('mixer.clear_all', { count: activeSoundItems.length })}
               icon="trash-can"
               onPress={clearMix}
               style={styles.clearAllButton}
             />
           </>
         ) : (
-          /* Empty state */
-          <View style={styles.emptyContainer}>
-            <View style={styles.iconContainer}>
-              <Icon name="sliders" size={80} color={colors.text.muted} solid />
-            </View>
-
-            <TouchableOpacity
-              style={styles.addBox}
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate('Library' as never)}
-            >
-              <GlassBlur blurAmount={12} fallbackColor="rgba(47,52,72,0.7)" />
-              <Text style={styles.addText}>
-                Mixleyeceğiniz sesleri eklemek için tıklayın.
-              </Text>
-              <View style={styles.plusCircle}>
-                <Icon name="plus" size={32} color="#FFFFFF" />
-              </View>
-            </TouchableOpacity>
-          </View>
+          <EmptyState
+            icon="sliders"
+            actionLabel={t('mixer.add_sounds_msg')}
+            onAction={() => navigation.navigate('Library' as never)}
+          />
         )}
 
         {/* Saved Mixes — always visible if any */}
         {savedMixes.length > 0 && (
           <View style={styles.savedSection}>
-            <Text style={styles.savedTitle}>Kayıtlı Mixlerim</Text>
+            <Text style={styles.savedTitle}>{t('mixer.saved_mixes')}</Text>
             {savedMixes.map((mix: any) => (
-              <GlassCard
+              <SavedMixRow
                 key={mix.id}
-                variant="normal"
-                style={styles.savedMixCard}
-                contentStyle={styles.savedMixContent}
-              >
-                {/* Left: icon + name + count */}
-                <View style={styles.savedMixLeft}>
-                  <View style={styles.savedMixIcon}>
-                    <Icon name="music" size={15} color={colors.accent.primary} solid />
-                  </View>
-                  <View>
-                    <Text style={styles.savedMixName}>{mix.name}</Text>
-                    <Text style={styles.savedMixMeta}>
-                      {Array.isArray(mix.sounds) ? mix.sounds.length : Object.keys(mix.sounds || {}).length} ses
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Right: load + delete */}
-                <View style={styles.savedMixActions}>
-                  <TouchableOpacity
-                    style={styles.loadBtn}
-                    onPress={() => handleLoadMix(mix.id)}
-                    activeOpacity={0.75}
-                  >
-                    <Icon name="play" size={16} color={colors.accent.success} solid />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.deleteBtn}
-                    onPress={() => deleteSavedMix(mix.id)}
-                    activeOpacity={0.75}
-                  >
-                    <Icon name="xmark" size={12} color={colors.text.secondary} />
-                  </TouchableOpacity>
-                </View>
-              </GlassCard>
+                name={mix.name}
+                count={
+                  Array.isArray(mix.sounds)
+                    ? mix.sounds.length
+                    : Object.keys(mix.sounds || {}).length
+                }
+                loading={loadingAdMixId === mix.id}
+                disabled={loadingAdMixId !== null}
+                onPlay={() => handleLoadMix(mix.id)}
+                onDelete={() => deleteSavedMix(mix.id)}
+              />
             ))}
           </View>
         )}
-      </ScrollView>
-    </SafeAreaView>
+        <BannerAdView />
+      </ScreenScrollView>
+      <GlassToast
+        visible={showNetworkToast}
+        message={t('common.network_error')}
+        type="error"
+        onHide={() => setShowNetworkToast(false)}
+      />
+    </AppScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
   scrollContent: {
-    paddingHorizontal: layout.padding.screenHorizontal,
-    paddingBottom: layout.padding.screenBottomDefault,
     flexGrow: 1,
   },
-  listContainer: {
-    gap: 20,
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  saveMixCard: {
-    marginBottom: 24,
-  },
-  saveMixContent: {
+  presetBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: layout.spacing.md,
-    paddingVertical: layout.spacing.md,
-  },
-  saveInput: {
-    flex: 1,
-    color: colors.text.primary,
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-  },
-  saveBtn: {
-    backgroundColor: colors.accent.success,
-    paddingHorizontal: layout.spacing.lg,
-    paddingVertical: layout.spacing.sm,
-    borderRadius: layout.radius.pill,
-  },
-  saveBtnText: {
-    color: colors.text.dark,
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 13,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-    gap: 40,
-    marginTop: -40,
+    gap: spacing.sm,
+    backgroundColor: 'rgba(145, 178, 223, 0.1)',
+    alignSelf: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 6,
+    borderRadius: 100,
+    borderWidth: 0.5,
+    borderColor: 'rgba(145, 178, 223, 0.2)',
+    marginBottom: spacing.md,
   },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
+  presetNameText: {
+    color: colors.accent.primary,
+    fontSize: fontSize.caption,
+    fontFamily: fontFamily.semiBold,
   },
-  addBox: {
-    width: '100%',
-    backgroundColor: 'transparent',
-    borderRadius: layout.radius.xxl,
-    padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 40,
-    borderWidth: 1,
-    borderColor: colors.glass.border,
-    overflow: 'hidden',
-  },
-  addText: {
-    color: colors.text.primary,
-    fontSize: 15,
-    fontFamily: 'Inter-Light',
-    textAlign: 'center',
-    opacity: 0.9,
-    lineHeight: 22,
-  },
-  plusCircle: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
+  listContainer: {
+    gap: spacing.lg,
+    marginTop: 10,
+    marginBottom: spacing.xl,
   },
   addMoreSection: {
     alignItems: 'center',
-    marginVertical: 20,
-  },
-  plusButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.accent.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginVertical: spacing.xl,
   },
   clearAllButton: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   savedSection: {
-    marginTop: 32,
+    marginTop: spacing.xxxl,
     gap: layout.spacing.sm,
   },
   savedTitle: {
     color: colors.text.secondary,
     fontSize: 12,
-    fontFamily: 'Inter-SemiBold',
+    fontFamily: fontFamily.semiBold,
     letterSpacing: 0.8,
     textTransform: 'capitalize',
     marginBottom: layout.spacing.sm,
-  },
-  savedMixCard: {
-    marginBottom: layout.spacing.sm,
-  },
-  savedMixContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  savedMixLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: layout.spacing.md,
-    flex: 1,
-  },
-  savedMixIcon: {
-    width: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  savedMixName: {
-    color: colors.text.primary,
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-  },
-  savedMixMeta: {
-    color: colors.text.muted,
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    marginTop: 2,
-  },
-  savedMixActions: {
-    flexDirection: 'row',
-    gap: layout.spacing.sm,
-  },
-  loadBtn: {
-    padding: layout.spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deleteBtn: {
-    padding: layout.spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0.3,
   },
 });
 

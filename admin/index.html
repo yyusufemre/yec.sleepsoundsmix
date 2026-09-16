@@ -1,0 +1,2439 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Calmix Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d1319;
+      --panel: #151c24;
+      --panel-2: #101720;
+      --line: #263241;
+      --text: #edf4ff;
+      --muted: #9aa8b8;
+      --accent: #47f185;
+      --accent-hover: #3ce076;
+      --danger: #ff6b6b;
+      --warn: #ffd166;
+      --input: #0b1017;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 10px;
+      --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      /* Desktop / Web Density (Compact, Sleek & Ergonomic SMLXL Tokens) */
+      --btn-height: 32px;
+      --input-height: 32px;
+      --icon-btn-size: 28px;
+      --mini-play-size: 28px;
+      --font-size-base: 12px;
+      --font-size-input: 12px;
+      --card-padding: 10px;
+      --card-gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        /* Mobile Touch Density: Spacious Finger Targets */
+        --btn-height: 44px;
+        --input-height: 44px;
+        --icon-btn-size: 44px;
+        --mini-play-size: 38px;
+        --font-size-base: 13px;
+        --font-size-input: 16px; /* Prevents iOS auto-zoom */
+        --card-padding: 12px;
+        --card-gap: 10px;
+      }
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      min-width: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.45;
+      -webkit-text-size-adjust: 100%;
+      /* Content must fit strictly within 100% viewport width without masking */
+    }
+
+    /* Accessibility focus indicators */
+    *:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Respect reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: none;
+      border-radius: var(--radius-md);
+      background: #1b2632;
+      color: var(--text);
+      cursor: pointer;
+      padding: 6px 12px;
+      min-height: var(--btn-height);
+      font-size: var(--font-size-base);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.1s ease;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    button:hover {
+      background: #223040;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border: none;
+      color: #07110c;
+      font-weight: 700;
+    }
+
+    button.primary:hover {
+      background: var(--accent-hover);
+    }
+
+    button.accent-outline {
+      background: rgba(71, 241, 133, 0.12);
+      border: none;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    button.accent-outline:hover {
+      background: rgba(71, 241, 133, 0.22);
+    }
+
+    button.danger {
+      border: none;
+      color: #ffd0d0;
+      background: rgba(255, 107, 107, 0.15);
+    }
+
+    button.danger:hover {
+      background: rgba(255, 107, 107, 0.28);
+    }
+
+    button.ghost {
+      background: transparent;
+      border: none;
+    }
+
+    button.ghost:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--input);
+      color: var(--text);
+      padding: 5px 8px;
+      min-height: var(--input-height);
+      font-size: var(--font-size-input);
+      outline: none;
+      transition: background 0.15s ease;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      background: #141f2d;
+    }
+
+    /* Prevent automatic zoom on iOS input focus by maintaining minimum 16px font-size on mobile */
+    @media (max-width: 768px) {
+
+      input,
+      select,
+      textarea {
+        font-size: 16px !important;
+      }
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      z-index: 50;
+      border-bottom: none;
+      background: rgba(13, 19, 25, 0.96);
+      backdrop-filter: blur(14px);
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+
+    @media (min-width: 1024px) {
+      header {
+        position: sticky;
+        top: 0;
+      }
+    }
+
+    .bar {
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .bar {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+      }
+    }
+
+    .header-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      background: rgba(255, 255, 255, 0.05);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pill.good {
+      color: var(--accent);
+      border: none;
+      background: rgba(71, 241, 133, 0.12);
+      font-weight: 600;
+    }
+
+    .pill.warn {
+      color: var(--warn);
+      border: none;
+      background: rgba(255, 209, 102, 0.12);
+      font-weight: 600;
+    }
+
+    /* Main Container */
+    main {
+      width: 100%;
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+    }
+
+    @media (max-width: 1023px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+        padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .side {
+        order: -1;
+        /* Put control panel on top on tablet/mobile */
+      }
+    }
+
+    /* Panels */
+    .panel {
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      width: 100%;
+    }
+
+    .panel-head {
+      padding: 14px 16px;
+      border-bottom: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Toolbar & Filters */
+    .tools {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: none;
+      background: var(--panel-2);
+    }
+
+    @media (min-width: 860px) {
+      .tools {
+        display: grid;
+        grid-template-columns: minmax(200px, 1fr) auto auto;
+        align-items: center;
+      }
+    }
+
+    .segment-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    @media (min-width: 520px) {
+      .segment-group {
+        flex-direction: row;
+        width: auto;
+      }
+    }
+
+    .segment {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 4px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--input);
+      width: 100%;
+    }
+
+    @media (min-width: 520px) {
+      .segment {
+        width: auto;
+        display: inline-flex;
+      }
+    }
+
+    .segment button {
+      flex: 1 1 auto;
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--muted);
+      padding: 5px 9px;
+      font-size: var(--font-size-base);
+      min-height: var(--btn-height);
+    }
+
+    .segment button:hover {
+      background: #1b2632;
+      color: var(--text);
+    }
+
+    .segment button.active {
+      background: var(--accent);
+      color: #07110c;
+      font-weight: 700;
+    }
+
+    /* Sounds Grid Container - Content Driven Auto Layout */
+    .sounds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+      gap: 14px;
+      padding: 16px;
+      width: 100%;
+    }
+
+    /* Desktop scrolling for list, natural document scroll for mobile */
+    @media (min-width: 1024px) {
+      .sounds-grid {
+        max-height: calc(100dvh - 180px);
+        overflow-y: auto;
+      }
+
+      /* Custom scrollbar for grid */
+      .sounds-grid::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .sounds-grid::-webkit-scrollbar-track {
+        background: var(--panel);
+      }
+
+      .sounds-grid::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 4px;
+      }
+
+      .sounds-grid::-webkit-scrollbar-thumb:hover {
+        background: #3b4e64;
+      }
+    }
+
+    /* Sound Cards */
+    .sound-card {
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--panel-2);
+      padding: var(--card-padding);
+      display: flex;
+      flex-direction: column;
+      gap: var(--card-gap);
+      position: relative;
+      transition: box-shadow 0.2s, transform 0.15s;
+      width: 100%;
+    }
+
+    .sound-card:hover {
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .sound-card.locked {
+      background: #1c2735;
+      border: none;
+    }
+
+    .sound-card.locked:hover {
+      box-shadow: 0 6px 18px rgba(46, 61, 81, 0.5);
+    }
+
+    .sound-card.invalid {
+      border: 1px solid rgba(255, 107, 107, 0.6);
+      background: rgba(255, 107, 107, 0.05);
+    }
+
+    .sound-card.dragging {
+      opacity: 0.35;
+      transform: scale(0.96);
+      border: 2px dashed var(--accent);
+    }
+
+    .new-sound-drop-card {
+      border: 2px dashed rgba(71, 241, 133, 0.4);
+      background: rgba(71, 241, 133, 0.04);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .new-sound-drop-card:hover {
+      border-color: var(--accent);
+      background: rgba(71, 241, 133, 0.1);
+      box-shadow: 0 0 22px rgba(71, 241, 133, 0.2);
+    }
+
+    .drop-placeholder {
+      border: 2px dashed var(--accent);
+      border-radius: var(--radius-lg);
+      background: rgba(71, 241, 133, 0.08);
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 0 20px rgba(71, 241, 133, 0.15);
+      animation: pulseGlow 1.2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from {
+        background: rgba(71, 241, 133, 0.06);
+        border-color: rgba(71, 241, 133, 0.4);
+      }
+
+      to {
+        background: rgba(71, 241, 133, 0.16);
+        border-color: var(--accent);
+      }
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+      border-bottom: none;
+      padding-bottom: 2px;
+      width: 100%;
+    }
+
+    .card-top-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+    }
+
+    .card-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(71, 241, 133, 0.12);
+      padding: 2px 5px;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    /* Card Top Icon Buttons (Flat, Transparent BG, No Border) */
+    .card-top .icon-button,
+    .card-top .lock-toggle-btn,
+    .card-top .drag-handle {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+      font-size: 13px;
+    }
+
+    /* Ergonomic Icon Buttons (Transparent BG, No Stroke, Only Trash Red) */
+    .icon-button {
+      width: var(--icon-btn-size);
+      height: var(--icon-btn-size);
+      min-width: var(--icon-btn-size);
+      min-height: var(--icon-btn-size);
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      touch-action: manipulation;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s ease, transform 0.1s ease;
+    }
+
+    .icon-button:hover {
+      color: var(--text);
+      background: transparent !important;
+    }
+
+    .icon-button:active {
+      transform: scale(0.92);
+    }
+
+    .icon-button.danger {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: #ff5252 !important;
+    }
+
+    .icon-button.danger:hover {
+      color: #ff2a2a !important;
+      background: transparent !important;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--muted);
+      touch-action: none;
+      padding: 4px;
+      font-size: 13px;
+      min-width: var(--icon-btn-size);
+      min-height: var(--icon-btn-size);
+      display: inline-grid;
+      place-items: center;
+      background: transparent !important;
+      border: none !important;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    /* Mobile move buttons visible only on mobile/tablet screens (<1024px) */
+    .mobile-move-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    @media (min-width: 1024px) {
+      .mobile-move-btns {
+        display: none;
+      }
+    }
+
+    /* Textless Lock / AD Toggle Button (Flat, Transparent BG, No Border) */
+    .lock-toggle-btn {
+      width: var(--icon-btn-size);
+      height: var(--icon-btn-size);
+      min-width: var(--icon-btn-size);
+      min-height: var(--icon-btn-size);
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      cursor: pointer;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      transition: all 0.15s ease;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .lock-toggle-btn.is-locked {
+      background: transparent !important;
+      border: none !important;
+      color: var(--warn) !important;
+      box-shadow: none !important;
+    }
+
+    .lock-toggle-btn.is-locked:hover {
+      color: #ffe07d !important;
+    }
+
+    .lock-toggle-btn.is-free {
+      background: transparent !important;
+      border: none !important;
+      color: var(--muted) !important;
+    }
+
+    .lock-toggle-btn.is-free:hover {
+      color: var(--text) !important;
+    }
+
+    /* Inner Input Container Box (No Stroke) */
+    .card-field {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      width: 100%;
+      background: var(--input);
+      border-radius: var(--radius-md);
+      padding: 7px 10px;
+      border: none !important;
+      box-shadow: none !important;
+      transition: background 0.15s ease;
+    }
+
+    .card-field:focus-within {
+      background: #141f2d;
+    }
+
+    .card-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .card-input {
+      padding: 0 !important;
+      font-size: var(--font-size-input);
+      border-radius: 0 !important;
+      border: none !important;
+      background: transparent !important;
+      outline: none !important;
+      color: var(--text);
+      width: 100%;
+      min-height: auto !important;
+      box-shadow: none !important;
+    }
+
+    select.card-input {
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237b8e9f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 2px center !important;
+      background-size: 12px !important;
+      padding-right: 18px !important;
+    }
+
+    .card-input.id-field {
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    @media (max-width: 768px) {
+      .card-input.id-field {
+        font-size: 14px;
+      }
+    }
+
+    .card-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      align-items: center;
+      width: 100%;
+    }
+
+    @media (max-width: 360px) {
+      .card-row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Custom Audio Player & Details (No Strokes) */
+    .custom-audio-player {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--input);
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: var(--radius-md);
+      padding: 6px 10px;
+      margin-top: 2px;
+      width: 100%;
+    }
+
+    .mini-play-btn {
+      width: var(--mini-play-size);
+      height: var(--mini-play-size);
+      min-width: var(--mini-play-size);
+      min-height: var(--mini-play-size);
+      border-radius: 50%;
+      background: var(--accent);
+      border: 0;
+      color: #07110c;
+      font-size: 11px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .mini-play-btn:hover {
+      transform: scale(1.06);
+      background: var(--accent-hover);
+    }
+
+    .mini-play-btn.playing {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .custom-progress-container {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: var(--input-height);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 4px 0;
+      touch-action: manipulation;
+    }
+
+    .custom-progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .custom-progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.1s linear;
+    }
+
+    .custom-time-display {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      min-width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Translation details (Stroke-free) */
+    .translations-details summary {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 10px;
+      min-height: var(--btn-height);
+      border: none !important;
+      border-radius: var(--radius-md);
+      background: var(--input);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .translations-details summary:hover {
+      background: #141f2d;
+    }
+
+    .translations-details[open] summary {
+      margin-bottom: 6px;
+      background: var(--accent);
+      color: #07110c;
+      border-color: var(--accent);
+    }
+
+    .translations-content {
+      background: rgba(0, 0, 0, 0.25);
+      border: none !important;
+      padding: 8px;
+      border-radius: var(--radius-md);
+      width: 100%;
+    }
+
+    .translation-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .translation-field {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .translation-field span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Side Control Panel */
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: 100%;
+    }
+
+    @media (min-width: 1024px) {
+      .side {
+        position: sticky;
+        top: 80px;
+      }
+    }
+
+    .control-panel-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .control-actions-auto {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 480px) and (max-width: 1023px) {
+      .control-actions-auto {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .publish-btn-large {
+      grid-column: 1 / -1;
+      padding: 10px 14px;
+      min-height: 40px;
+      font-size: 13px;
+      box-shadow: 0 4px 18px rgba(71, 241, 133, 0.25);
+    }
+
+    @media (max-width: 768px) {
+      .publish-btn-large {
+        padding: 14px;
+        min-height: 48px;
+        font-size: 15px;
+      }
+    }
+
+    .file-btn-full {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .file-btn-full input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .messages {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 360px;
+      overflow-y: auto;
+      border-top: none;
+    }
+
+    .message {
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .message.bad {
+      color: #ffd0d0;
+      border: none;
+      background: rgba(255, 107, 107, 0.12);
+    }
+
+    .message.warn {
+      color: #ffe0a3;
+      border: none;
+      background: rgba(255, 209, 102, 0.12);
+    }
+
+    .message.good {
+      color: #c8ffd9;
+      border: none;
+      background: rgba(71, 241, 133, 0.12);
+    }
+
+    .empty {
+      padding: 40px 20px;
+      color: var(--muted);
+      text-align: center;
+      grid-column: 1 / -1;
+      font-size: 14px;
+    }
+
+    .tiny-button {
+      padding: 8px 12px;
+      font-size: 12px;
+      min-height: var(--touch-min);
+    }
+
+    /* Guide Panel with Safe Content Bounds */
+    .guide-panel {
+      grid-column: 1 / -1;
+      background: #121922;
+      border: none;
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 8px;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .guide-card {
+      background: var(--panel);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .guide-card h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .guide-card ol,
+    .guide-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .guide-card li {
+      margin-bottom: 6px;
+    }
+
+    .guide-card li strong {
+      color: var(--text);
+    }
+
+    .guide-code {
+      background: var(--input);
+      border: none;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    /* Drag & Drop Fullscreen Overlay */
+    .page-dropzone-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(13, 19, 25, 0.92);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      border: 4px dashed var(--accent);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      padding: 20px;
+    }
+
+    .page-dropzone-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .page-dropzone-box {
+      background: var(--panel);
+      border: 1px solid var(--accent);
+      padding: 28px 36px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(71, 241, 133, 0.25);
+      max-width: calc(100vw - 32px);
+    }
+
+    .page-dropzone-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .page-dropzone-sub {
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    /* Floating Action Bar for Mobile */
+    .mobile-action-bar {
+      display: none;
+    }
+
+    @media (max-width: 1023px) {
+      .mobile-action-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        background: rgba(13, 19, 25, 0.96);
+        backdrop-filter: blur(16px);
+        border-top: 1px solid var(--line);
+        padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px;
+        gap: 10px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .mobile-action-bar button {
+        flex: 1;
+        min-height: 48px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Fullscreen File Drag-and-Drop Overlay -->
+  <div id="pageDropOverlay" class="page-dropzone-overlay" role="region" aria-label="Dosya yükleme alanı">
+    <div class="page-dropzone-box">
+      <div style="font-size: 42px; margin-bottom: 12px; color: var(--accent);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <div class="page-dropzone-title">Ses Dosyasını Buraya Bırakın</div>
+      <div class="page-dropzone-sub">Dosya otomatik olarak Firebase Storage'a yüklenecek ve yeni ses olarak eklenecektir.</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="bar">
+      <div class="header-title-group">
+        <h1><i class="fa-solid fa-compact-disc" style="color: var(--accent);"></i> Calmix Admin</h1>
+        <div class="subtitle">Ses koleksiyonunuzu yönetin ve tek tıkla Firebase Storage'a yayınlayın.</div>
+      </div>
+      <div class="header-controls">
+        <button id="guideButton" type="button" class="accent-outline"><i class="fa-solid fa-book-open"></i> Rehber</button>
+        <div class="stats" id="stats" aria-label="İstatistikler"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Collapsible Guide Panel -->
+    <section class="panel guide-panel" id="guidePanel" hidden aria-label="Kullanım Rehberi">
+      <div class="panel-head" style="padding: 0 0 10px 0; border-bottom: 1px solid var(--line);">
+        <div class="panel-title" style="color: var(--accent);">
+          <i class="fa-solid fa-book-open"></i> Admin Paneli Kullanım & Ses Güncelleme Rehberi
+        </div>
+        <button id="closeGuideButton" type="button" class="ghost tiny-button" style="color: var(--muted);" aria-label="Kapat"><i class="fa-solid fa-xmark"></i> Kapat</button>
+      </div>
+
+      <div class="guide-grid">
+        <div class="guide-card">
+          <h3><i class="fa-solid fa-cloud-arrow-up"></i> 1. Ses Ekleme</h3>
+          <ol>
+            <li>Ses dosyasını (<span class="guide-code">.mp3</span> / <span class="guide-code">.m4a</span>) <strong>sayfanın herhangi bir yerine sürükleyin</strong> veya <strong>"Yeni Ses"</strong> / <strong>"Ses Dosyası Seç"</strong> butonunu kullanın.</li>
+            <li>Dosya otomatik olarak Firebase Storage'a yüklenir.</li>
+            <li>Yeni eklenen ses kartının <strong>Başlık</strong> alanına odaklanılır.</li>
+          </ol>
+        </div>
+
+        <div class="guide-card">
+          <h3><i class="fa-solid fa-pen-to-square"></i> 2. Kart Düzenleme & Çeviriler</h3>
+          <ol>
+            <li><strong>Başlık & ID:</strong> Ses kartı üzerinden başlık ve ID bilgilerini girin.</li>
+            <li><strong>Çeviriler:</strong> Karttaki <span class="guide-code">Çeviriler</span> alanını açıp <span class="guide-code">Çevir</span> butonuna basın (6 dil otomatik dolar).</li>
+            <li><strong>Sıralama:</strong> Masaüstünde sürükle-bırak yapın veya dokunmatik ekranlarda <span class="guide-code">▲ / ▼</span> butonlarını kullanın.</li>
+          </ol>
+        </div>
+
+        <div class="guide-card">
+          <h3><i class="fa-solid fa-fire"></i> 3. Tek Tıkla Yayınlama</h3>
+          <ol>
+            <li><span class="guide-code">Firebase'e Yayınla</span> butonuna tıklayın.</li>
+            <li>Sistem listenizin otomatik yedek kopyasını alır ve güncellemeleri canlı Firebase Storage'a aktarır.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Left Panel: Sounds Grid -->
+    <section class="panel" aria-label="Ses Kartları Listesi">
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa-solid fa-list-ul" style="color: var(--accent);"></i> Ses Kartları Listesi</div>
+      </div>
+
+      <!-- Toolbar & Filters -->
+      <div class="tools">
+        <input id="searchInput" type="search" placeholder="Ara: ID, başlık, ikon veya URL..." aria-label="Ses arama">
+        <div class="segment-group">
+          <div class="segment" id="categoryFilter" aria-label="Kategori filtresi">
+            <button class="active" type="button" data-value="all">Tümü</button>
+            <button type="button" data-value="nature">Nature</button>
+            <button type="button" data-value="music">Music</button>
+            <button type="button" data-value="ambience">Ambience</button>
+          </div>
+          <div class="segment" id="lockFilter" aria-label="Erişim filtresi">
+            <button class="active" type="button" data-value="all">Tümü</button>
+            <button type="button" data-value="free">Ücretsiz</button>
+            <button type="button" data-value="locked">Kilitli</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid of Sound Cards -->
+      <div id="soundsGrid" class="sounds-grid"></div>
+      <div id="emptyState" class="empty" hidden>Henüz ses bulunamadı. "Yeni Ses" butonuna basarak veya dosya yükleyerek ekleyebilirsiniz.</div>
+    </section>
+
+    <!-- Right Side Panel: Actions & Control Panel -->
+    <aside class="side" aria-label="Kontrol Paneli">
+      <section class="panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa-solid fa-sliders" style="color: var(--accent);"></i> Kontrol & İşlemler</div>
+          <button id="validateButton" type="button" class="tiny-button"><i class="fa-solid fa-circle-check"></i> Doğrula</button>
+        </div>
+
+        <div class="control-panel-grid">
+          <div class="control-actions-auto">
+            <button id="publishButton" class="primary publish-btn-large" type="button"><i class="fa-solid fa-fire"></i> Firebase'e Yayınla</button>
+            <button id="newButton" class="accent-outline" type="button"><i class="fa-solid fa-plus"></i> Yeni Ses</button>
+            <button id="firebaseButton" type="button"><i class="fa-solid fa-arrows-rotate"></i> Firebase'den Çek</button>
+            <button class="file file-btn-full" type="button"><i class="fa-solid fa-folder-open"></i> Yerel JSON Yükle<input id="fileInput" type="file" accept=".json,application/json" aria-label="Yerel JSON yükle"></button>
+          </div>
+        </div>
+
+        <!-- Validation & Notice Messages Area -->
+        <div id="messages" class="messages" aria-live="polite" aria-label="Durum Mesajları"></div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Sticky Bottom Floating Action Bar for Mobile Viewports -->
+  <div id="mobileActionBar" class="mobile-action-bar" aria-label="Mobil Hızlı İşlemler">
+    <button id="mobilePublishBtn" class="primary" type="button"><i class="fa-solid fa-fire"></i> Yayınla</button>
+    <button id="mobileNewBtn" class="accent-outline" type="button"><i class="fa-solid fa-plus"></i> Yeni Ses</button>
+  </div>
+
+  <script>
+    const CATEGORIES = ["nature", "music", "ambience"];
+    const FIREBASE_SOUNDLIST_URL = "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/soundlist.json?alt=media";
+    const LANGUAGES = [
+      { code: "tr", label: "TR" },
+      { code: "en", label: "EN" },
+      { code: "es", label: "ES" },
+      { code: "pt", label: "PT" },
+      { code: "de", label: "DE" },
+      { code: "fr", label: "FR" },
+      { code: "ja", label: "JA" },
+    ];
+    const TARGET_LANGUAGES = LANGUAGES.filter((language) => language.code !== "tr");
+    const STORAGE_KEY = "calmix-admin-draft";
+    const SPECIAL_SOUND_RULES = {
+      "nefes-ritmi": { isMetronome: true, requiresAudioUrl: false },
+    };
+
+    const state = {
+      sounds: [],
+      lastNotice: null,
+      draggedIndex: null,
+      openTranslationsIndex: null,
+    };
+
+    const els = {
+      stats: document.querySelector("#stats"),
+      firebaseButton: document.querySelector("#firebaseButton"),
+      fileInput: document.querySelector("#fileInput"),
+      newButton: document.querySelector("#newButton"),
+      searchInput: document.querySelector("#searchInput"),
+      categoryFilter: document.querySelector("#categoryFilter"),
+      lockFilter: document.querySelector("#lockFilter"),
+      soundsGrid: document.querySelector("#soundsGrid"),
+      emptyState: document.querySelector("#emptyState"),
+      validateButton: document.querySelector("#validateButton"),
+      messages: document.querySelector("#messages"),
+      publishButton: document.querySelector("#publishButton"),
+      guideButton: document.querySelector("#guideButton"),
+      guidePanel: document.querySelector("#guidePanel"),
+      closeGuideButton: document.querySelector("#closeGuideButton"),
+      mobilePublishBtn: document.querySelector("#mobilePublishBtn"),
+      mobileNewBtn: document.querySelector("#mobileNewBtn"),
+    };
+
+    function normalizeSound(sound) {
+      const id = String(sound.id || "").trim();
+      const title = String(sound.title || "").trim();
+      const titleTranslations = normalizeTitleTranslations(sound.titleTranslations, title);
+      const rules = getSpecialSoundRules({ id, isMetronome: sound.isMetronome });
+
+      const normalized = {
+        id,
+        title,
+        icon: String(sound.icon || "").trim(),
+        url: String(sound.url || "").trim(),
+        isLocked: Boolean(sound.isLocked),
+        category: CATEGORIES.includes(sound.category) ? sound.category : "nature",
+        titleTranslations,
+      };
+
+      if (rules.isMetronome === true) {
+        normalized.isMetronome = true;
+      }
+
+      return normalized;
+    }
+
+    function getSpecialSoundRules(sound) {
+      const idRules = SPECIAL_SOUND_RULES[sound.id] || {};
+      return {
+        ...idRules,
+        isMetronome: sound.isMetronome === true || idRules.isMetronome === true,
+      };
+    }
+
+    function normalizeTitleTranslations(translations, fallbackTitle) {
+      const next = {};
+      LANGUAGES.forEach(({ code }) => {
+        const value = translations && typeof translations === "object" ? translations[code] : "";
+        next[code] = String(value || (code === "tr" ? fallbackTitle : "") || "").trim();
+      });
+      return next;
+    }
+
+    function loadSounds(sounds) {
+      if (!Array.isArray(sounds)) {
+        throw new Error("JSON kök değeri bir array olmalı.");
+      }
+      state.sounds = sounds.map(normalizeSound);
+      state.lastNotice = { type: "good", text: `${state.sounds.length} ses yüklendi.` };
+      persistDraft();
+      render();
+    }
+
+    async function fetchFirebaseSounds() {
+      const response = await fetch(`${FIREBASE_SOUNDLIST_URL}&cb=${Date.now()}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const sounds = await response.json();
+      if (!Array.isArray(sounds)) throw new Error("Firebase soundlist array dönmedi.");
+      return sounds.map(normalizeSound);
+    }
+
+    function getFilteredRows() {
+      const query = els.searchInput.value.trim().toLowerCase();
+      const category = getSegmentValue(els.categoryFilter);
+      const lock = getSegmentValue(els.lockFilter);
+
+      return state.sounds
+        .map((sound, index) => ({ sound, index }))
+        .filter(({ sound }) => {
+          const translationText = Object.values(sound.titleTranslations || {}).join(" ");
+          const text = [sound.id, sound.title, translationText, sound.icon, sound.url, sound.category].join(" ").toLowerCase();
+          const matchesQuery = !query || text.includes(query);
+          const matchesCategory = category === "all" || sound.category === category;
+          const matchesLock = lock === "all" || (lock === "locked" ? sound.isLocked : !sound.isLocked);
+          return matchesQuery && matchesCategory && matchesLock;
+        });
+    }
+
+    function render() {
+      renderStats();
+      renderGrid();
+      renderMessages(validateSounds(state.sounds));
+    }
+
+    function renderStats() {
+      const total = state.sounds.length;
+      const free = state.sounds.filter((sound) => !sound.isLocked).length;
+      const locked = total - free;
+      const categories = CATEGORIES.map((category) => {
+        const count = state.sounds.filter((sound) => sound.category === category).length;
+        return `<span class="pill">${category}: ${count}</span>`;
+      }).join("");
+
+      const isLan = window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+      const lanBadge = isLan ? `<span class="pill warn" title="Yerel Ağ Erişimi"><i class="fa-solid fa-wifi"></i> LAN</span>` : "";
+
+      els.stats.innerHTML = `
+        ${lanBadge}
+        <span class="pill good">Toplam: ${total}</span>
+        <span class="pill">Ücretsiz: ${free}</span>
+        <span class="pill">Kilitli: ${locked}</span>
+        ${categories}
+      `;
+    }
+
+    function renderGrid() {
+      const invalidIndexes = new Set(validateSounds(state.sounds).filter((message) => message.index !== undefined).map((message) => message.index));
+      const rows = getFilteredRows();
+      els.emptyState.hidden = state.sounds.length > 0;
+
+      const addCardHtml = `
+        <div class="sound-card new-sound-drop-card" id="addSoundCard" title="Yeni ses eklemek için tıklayın veya dosya sürükleyin">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 220px; gap: 10px; cursor: pointer; text-align: center;">
+            <div style="font-size: 38px; color: var(--accent);"><i class="fa-solid fa-circle-plus"></i></div>
+            <div style="font-weight: 700; font-size: 15px; color: var(--accent);">Yeni Ses Yükle</div>
+            <div style="font-size: 12px; color: var(--muted); padding: 0 10px;">Tıklayın veya dosyayı buraya bırakın</div>
+            <input type="file" accept="audio/*,.m4a,.mp3,.wav,.aac" id="newCardFileInput" style="display: none;" aria-label="Yeni ses dosyası seç">
+          </div>
+        </div>
+      `;
+
+      els.soundsGrid.innerHTML = addCardHtml + rows.map(({ sound, index }) => `
+        <div class="sound-card ${sound.isLocked ? "locked" : ""} ${invalidIndexes.has(index) ? "invalid" : ""}" data-index="${index}" draggable="true">
+          <div class="card-top">
+            <div class="card-top-left">
+              <i class="fa-solid fa-grip-vertical drag-handle" title="Sürükle bırak" draggable="true" data-action="drag" aria-label="Sürükle bırak"></i>
+              <span class="card-num">#${index + 1}</span>
+              <div class="mobile-move-btns">
+                <button class="icon-button" type="button" data-action="move-up" title="Yukarı taşı" aria-label="Yukarı taşı" ${index === 0 ? "disabled" : ""}>
+                  <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <button class="icon-button" type="button" data-action="move-down" title="Aşağı taşı" aria-label="Aşağı taşı" ${index === state.sounds.length - 1 ? "disabled" : ""}>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-actions">
+              <label class="icon-button" title="Ses dosyası yükle" aria-label="Ses dosyası yükle" style="cursor: pointer;">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <input type="file" accept="audio/*,.m4a,.mp3,.wav,.aac" data-action="upload-audio" style="display: none;">
+              </label>
+              <button class="lock-toggle-btn ${sound.isLocked ? "is-locked" : "is-free"}" type="button" data-action="toggle-lock" title="${sound.isLocked ? 'Ödüllü Reklam Kilitli (Ücretsiz yapmak için tıklayın)' : 'Ücretsiz (Reklam eklemek için tıklayın)'}" aria-label="Erişim durumunu değiştir">
+                <i class="fa-solid fa-rectangle-ad"></i>
+              </button>
+              <button class="icon-button" type="button" data-action="duplicate" title="Kopyala" aria-label="Kopyala"><i class="fa-solid fa-copy"></i></button>
+              <button class="icon-button danger" type="button" data-action="delete" title="Sil" aria-label="Sil"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+
+          <div class="card-field">
+            <input class="card-input" data-field="title" value="${escapeAttr(sound.title)}" placeholder="Başlık (TR)" aria-label="Başlık Türkçe">
+          </div>
+
+          <div class="card-field">
+            <input class="card-input id-field" data-field="id" value="${escapeAttr(sound.id)}" placeholder="ID (örn: yagmur-1)" aria-label="Ses Kimliği ID">
+          </div>
+
+          <div class="card-row-2">
+            <div class="card-field">
+              <select class="card-input" data-field="category" aria-label="Kategori">
+                ${CATEGORIES.map((category) => `<option value="${category}" ${sound.category === category ? "selected" : ""}>${category}</option>`).join("")}
+              </select>
+            </div>
+            <div class="card-field">
+              <input class="card-input" data-field="icon" value="${escapeAttr(sound.icon)}" placeholder="İkon (örn: fire)" aria-label="İkon adı">
+            </div>
+          </div>
+
+          <div class="card-field">
+            <input class="card-input id-field" data-field="url" value="${escapeAttr(sound.url)}" placeholder="Ses URL (https://...)" aria-label="Ses dosyası URL adresi">
+          </div>
+
+          <details class="translations-details" data-index="${index}" ${state.openTranslationsIndex === index ? "open" : ""}>
+            <summary><i class="fa-solid fa-globe"></i> Çeviriler (${Object.values(sound.titleTranslations || {}).filter(Boolean).length}/${LANGUAGES.length})</summary>
+            <div class="translations-content">
+              <div class="translation-actions">
+                <button class="tiny-button primary" type="button" data-action="translate" title="Türkçe başlıktan diğer dillere çevir"><i class="fa-solid fa-language"></i> Çevir</button>
+                <button class="tiny-button" type="button" data-action="sync-tr" title="TR başlığı eşitle"><i class="fa-solid fa-rotate"></i> TR Eşitle</button>
+              </div>
+              <div class="translations-grid" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+                ${LANGUAGES.map((language) => `
+                  <label class="translation-field">
+                    <span>${language.label}</span>
+                    <input data-translation-lang="${language.code}" value="${escapeAttr((sound.titleTranslations || {})[language.code] || "")}" aria-label="Çeviri ${language.label}">
+                  </label>
+                `).join("")}
+              </div>
+            </div>
+          </details>
+
+          <div class="custom-audio-player" data-sound-url="${escapeAttr(sound.url)}" data-index="${index}">
+            <button type="button" class="mini-play-btn" data-action="toggle-audio" title="Oynat / Durdur" aria-label="Oynat / Durdur">
+              <i class="fa-solid fa-play"></i>
+            </button>
+            <div class="custom-progress-container" data-action="seek-audio" aria-label="Ses oynatma çubuğu">
+              <div class="custom-progress-bar">
+                <div class="custom-progress-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+            <span class="custom-time-display">0:00</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderMessages(messages) {
+      const visibleMessages = [];
+      if (state.lastNotice) visibleMessages.push(state.lastNotice);
+      visibleMessages.push(...messages);
+
+      if (visibleMessages.length === 0) {
+        els.messages.innerHTML = `<div class="message good"><i class="fa-solid fa-circle-check"></i> Sorun yok. JSON uygulama formatına uygun görünüyor.</div>`;
+        return;
+      }
+
+      els.messages.innerHTML = visibleMessages.map((message) => (
+        `<div class="message ${message.type}">${escapeHtml(message.text)}</div>`
+      )).join("");
+    }
+
+    function validateSounds(sounds) {
+      const messages = [];
+      const ids = new Map();
+
+      sounds.forEach((sound, index) => {
+        const label = sound.id || `#${index + 1}`;
+        const rules = getSpecialSoundRules(sound);
+        const requiresAudioUrl = rules.requiresAudioUrl !== false;
+
+        ["id", "title", "icon", "category"].forEach((field) => {
+          if (!sound[field]) {
+            messages.push({ type: "bad", index, text: `${label}: ${field} boş olamaz.` });
+          }
+        });
+
+        if (requiresAudioUrl && !sound.url) {
+          messages.push({ type: "bad", index, text: `${label}: url boş olamaz.` });
+        }
+
+        if (sound.id) {
+          if (ids.has(sound.id)) {
+            messages.push({ type: "bad", index, text: `${sound.id}: duplicate id. İlk sıra ${ids.get(sound.id) + 1}, tekrar sıra ${index + 1}.` });
+          }
+          ids.set(sound.id, index);
+        }
+
+        if (!CATEGORIES.includes(sound.category)) {
+          messages.push({ type: "bad", index, text: `${label}: category nature, music veya ambience olmalı.` });
+        }
+
+        if (typeof sound.isLocked !== "boolean") {
+          messages.push({ type: "bad", index, text: `${label}: isLocked boolean olmalı.` });
+        }
+
+        if (!sound.titleTranslations || typeof sound.titleTranslations !== "object") {
+          messages.push({ type: "warn", index, text: `${label}: titleTranslations eksik.` });
+        } else {
+          LANGUAGES.forEach(({ code }) => {
+            if (!String(sound.titleTranslations[code] || "").trim()) {
+              messages.push({ type: code === "tr" ? "bad" : "warn", index, text: `${label}: titleTranslations.${code} boş.` });
+            }
+          });
+        }
+
+        if (requiresAudioUrl && sound.url && !/^https?:\/\//i.test(sound.url)) {
+          messages.push({ type: "warn", index, text: `${label}: URL http/https ile başlamıyor.` });
+        }
+      });
+
+      return messages;
+    }
+
+    function persistDraft() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.sounds));
+    }
+
+    function restoreDraft() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      try {
+        const sounds = JSON.parse(raw);
+        if (Array.isArray(sounds)) {
+          state.sounds = sounds.map(normalizeSound);
+        }
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    function updateSound(index, field, value) {
+      const sound = state.sounds[index];
+      if (!sound) return;
+
+      if (field === "isLocked") {
+        sound.isLocked = Boolean(value);
+      } else {
+        sound[field] = String(value).trim();
+        if (field === "title") {
+          sound.titleTranslations = normalizeTitleTranslations(sound.titleTranslations, sound.title);
+          sound.titleTranslations.tr = sound.title;
+        }
+      }
+
+      state.lastNotice = null;
+      persistDraft();
+      renderStats();
+      renderMessages(validateSounds(state.sounds));
+    }
+
+    function moveSound(index, direction) {
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= state.sounds.length) return;
+
+      const [sound] = state.sounds.splice(index, 1);
+      state.sounds.splice(nextIndex, 0, sound);
+      state.lastNotice = { type: "good", text: `"${sound.title || sound.id}" sırası güncellendi.` };
+      persistDraft();
+      render();
+
+      // Focus management & Scroll into view
+      setTimeout(() => {
+        const movedCard = els.soundsGrid.querySelector(`.sound-card[data-index="${nextIndex}"]`);
+        if (movedCard) {
+          movedCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          const targetAction = direction === -1 ? "move-up" : "move-down";
+          let targetBtn = movedCard.querySelector(`button[data-action="${targetAction}"]`);
+          if (targetBtn && targetBtn.disabled) {
+            targetBtn = movedCard.querySelector(`button[data-action="${direction === -1 ? "move-down" : "move-up"}"]`);
+          }
+          if (targetBtn) {
+            targetBtn.focus();
+          }
+        }
+      }, 60);
+    }
+
+    function addSound() {
+      const id = uniqueId(`new-sound-${state.sounds.length + 1}`);
+      state.sounds.push({
+        id,
+        title: "Yeni Ses",
+        icon: "music",
+        url: "",
+        isLocked: false,
+        category: "nature",
+        titleTranslations: normalizeTitleTranslations(null, "Yeni Ses"),
+      });
+      state.lastNotice = { type: "good", text: "Yeni ses eklendi." };
+      persistDraft();
+      render();
+
+      const newIndex = state.sounds.length - 1;
+      const cardEl = els.soundsGrid.querySelector(`.sound-card[data-index="${newIndex}"]`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        const input = cardEl.querySelector(`input[data-field="title"]`);
+        if (input) {
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 150);
+        }
+      }
+    }
+
+    function duplicateSound(index) {
+      const sound = state.sounds[index];
+      if (!sound) return;
+
+      const copy = {
+        ...sound,
+        titleTranslations: { ...(sound.titleTranslations || {}) },
+        id: uniqueId(`${sound.id}-copy`),
+        title: `${sound.title} Copy`,
+      };
+      copy.titleTranslations.tr = copy.title;
+      state.sounds.splice(index + 1, 0, copy);
+      state.lastNotice = { type: "good", text: `${sound.title} kopyalandı.` };
+      persistDraft();
+      render();
+    }
+
+    function deleteSound(index) {
+      const sound = state.sounds[index];
+      if (!sound) return;
+      if (!confirm(`${sound.title || sound.id} silinsin mi?`)) return;
+
+      state.sounds.splice(index, 1);
+      state.lastNotice = { type: "good", text: "Ses silindi." };
+      persistDraft();
+      render();
+    }
+
+    function uniqueId(base) {
+      let id = slugify(base) || "sound";
+      let next = id;
+      let suffix = 2;
+      const ids = new Set(state.sounds.map((sound) => sound.id));
+
+      while (ids.has(next)) {
+        next = `${id}-${suffix}`;
+        suffix += 1;
+      }
+
+      return next;
+    }
+
+    function slugify(value) {
+      return String(value)
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/ı/g, "i")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replaceAll("\n", " ");
+    }
+
+    function updateTranslation(index, lang, value) {
+      const sound = state.sounds[index];
+      if (!sound) return;
+      sound.titleTranslations = normalizeTitleTranslations(sound.titleTranslations, sound.title);
+      sound.titleTranslations[lang] = String(value).trim();
+      state.lastNotice = null;
+      persistDraft();
+      renderStats();
+      renderMessages(validateSounds(state.sounds));
+    }
+
+    async function translateText(text, targetLanguage) {
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=tr|${encodeURIComponent(targetLanguage)}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json();
+      const translated = payload?.responseData?.translatedText;
+      if (!translated) throw new Error("Boş çeviri döndü.");
+      return String(translated).trim();
+    }
+
+    async function translateSound(index, onlyMissing = false) {
+      const sound = state.sounds[index];
+      if (!sound) return;
+      const sourceTitle = String(sound.title || "").trim();
+      if (!sourceTitle) {
+        state.lastNotice = { type: "bad", text: "Çeviri için önce Türkçe başlık gir." };
+        renderMessages(validateSounds(state.sounds));
+        return;
+      }
+
+      sound.titleTranslations = normalizeTitleTranslations(sound.titleTranslations, sourceTitle);
+      sound.titleTranslations.tr = sourceTitle;
+      state.lastNotice = { type: "good", text: `${sourceTitle}: çeviri hazırlanıyor...` };
+      renderMessages(validateSounds(state.sounds));
+
+      const failures = [];
+      for (const { code } of TARGET_LANGUAGES) {
+        if (onlyMissing && String(sound.titleTranslations[code] || "").trim()) continue;
+        try {
+          sound.titleTranslations[code] = await translateText(sourceTitle, code);
+        } catch (error) {
+          failures.push(`${code}: ${error.message}`);
+        }
+      }
+
+      state.lastNotice = failures.length
+        ? { type: "warn", text: `${sourceTitle}: bazı çeviriler alınamadı (${failures.join(", ")}).` }
+        : { type: "good", text: `${sourceTitle}: çeviriler eklendi.` };
+      persistDraft();
+      render();
+    }
+
+    function syncTurkishTranslation(index) {
+      const sound = state.sounds[index];
+      if (!sound) return;
+      sound.titleTranslations = normalizeTitleTranslations(sound.titleTranslations, sound.title);
+      sound.titleTranslations.tr = sound.title;
+      state.lastNotice = { type: "good", text: `${sound.title || sound.id}: TR başlık eşitlendi.` };
+      persistDraft();
+      render();
+    }
+
+    function getSegmentValue(segment) {
+      return segment.querySelector("button.active")?.dataset.value || "all";
+    }
+
+    function setSegmentValue(segment, value) {
+      segment.querySelectorAll("button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.value === value);
+      });
+    }
+
+    els.fileInput.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      try {
+        loadSounds(JSON.parse(await file.text()));
+      } catch (error) {
+        state.lastNotice = { type: "bad", text: `JSON okunamadı: ${error.message}` };
+        renderMessages(validateSounds(state.sounds));
+      } finally {
+        event.target.value = "";
+      }
+    });
+
+    els.firebaseButton.addEventListener("click", async () => {
+      els.firebaseButton.disabled = true;
+      const previousText = els.firebaseButton.textContent;
+      els.firebaseButton.textContent = "Çekiliyor...";
+      try {
+        loadSounds(await fetchFirebaseSounds());
+        state.lastNotice = { type: "good", text: "Firebase soundlist.json güncel haliyle yüklendi." };
+        renderMessages(validateSounds(state.sounds));
+      } catch (error) {
+        state.lastNotice = { type: "bad", text: `Firebase'den çekilemedi: ${error.message}` };
+        renderMessages(validateSounds(state.sounds));
+      } finally {
+        els.firebaseButton.disabled = false;
+        els.firebaseButton.textContent = previousText;
+      }
+    });
+
+    els.newButton.addEventListener("click", addSound);
+    if (els.mobileNewBtn) els.mobileNewBtn.addEventListener("click", addSound);
+
+    els.soundsGrid.addEventListener("input", (event) => {
+      const translationLang = event.target.dataset.translationLang;
+      if (translationLang) {
+        const card = event.target.closest(".sound-card[data-index]");
+        if (!card) return;
+        updateTranslation(Number(card.dataset.index), translationLang, event.target.value);
+        return;
+      }
+
+      const field = event.target.dataset.field;
+      if (!field) return;
+      const card = event.target.closest(".sound-card[data-index]");
+      if (!card) return;
+
+      updateSound(Number(card.dataset.index), field, field === "isLocked" ? event.target.checked : event.target.value);
+    });
+
+    els.soundsGrid.addEventListener("change", async (event) => {
+      const action = event.target.dataset.action;
+      if (action === "upload-audio") {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const card = event.target.closest(".sound-card[data-index]");
+        if (!card) return;
+        const index = Number(card.dataset.index);
+
+        state.lastNotice = { type: "good", text: `${file.name}: Firebase Storage'a yükleniyor...` };
+        renderMessages(validateSounds(state.sounds));
+
+        try {
+          /* Use relative API path so mobile devices on LAN reach the backend server! */
+          const response = await fetch("/api/upload-audio", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/octet-stream",
+              "x-file-name": encodeURIComponent(file.name),
+            },
+            body: file,
+          });
+
+          const data = await response.json();
+          if (!response.ok || data.error) {
+            throw new Error(data.error || `HTTP ${response.status}`);
+          }
+
+          updateSound(index, "url", data.url);
+          state.lastNotice = { type: "good", text: `🎵 ${data.filename} Firebase Storage'a başarıyla yüklendi ve link atandı!` };
+          renderGrid();
+        } catch (error) {
+          state.lastNotice = {
+            type: "bad",
+            text: `Ses dosyası yüklenemedi: Sunucunun açık olduğundan emin olun. Hata: ${error.message}`
+          };
+          renderMessages(validateSounds(state.sounds));
+        }
+        return;
+      }
+
+      const translationLang = event.target.dataset.translationLang;
+      if (translationLang) {
+        const card = event.target.closest(".sound-card[data-index]");
+        if (!card) return;
+        updateTranslation(Number(card.dataset.index), translationLang, event.target.value);
+        renderGrid();
+        return;
+      }
+
+      const field = event.target.dataset.field;
+      if (!field) return;
+      const card = event.target.closest(".sound-card[data-index]");
+      if (!card) return;
+
+      updateSound(Number(card.dataset.index), field, field === "isLocked" ? event.target.checked : event.target.value);
+      renderGrid();
+    });
+
+    // Global Custom Audio Manager
+    let currentAudio = null;
+    let currentPlayingCard = null;
+
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) return "0:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+    }
+
+    function stopGlobalAudio() {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+      if (currentPlayingCard) {
+        const btn = currentPlayingCard.querySelector(".mini-play-btn");
+        if (btn) {
+          btn.classList.remove("playing");
+          btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+        }
+        currentPlayingCard = null;
+      }
+    }
+
+    function toggleAudioPlay(playerEl) {
+      const url = playerEl.dataset.soundUrl;
+      if (!url) {
+        state.lastNotice = { type: "bad", text: "Oynatılacak ses URL'si boş." };
+        renderMessages(validateSounds(state.sounds));
+        return;
+      }
+
+      const card = playerEl.closest(".sound-card");
+      const btn = playerEl.querySelector(".mini-play-btn");
+      const progressFill = playerEl.querySelector(".custom-progress-fill");
+      const timeDisplay = playerEl.querySelector(".custom-time-display");
+
+      if (currentPlayingCard === card && currentAudio) {
+        if (currentAudio.paused) {
+          currentAudio.play();
+          btn.classList.add("playing");
+          btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+        } else {
+          currentAudio.pause();
+          btn.classList.remove("playing");
+          btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+        }
+        return;
+      }
+
+      stopGlobalAudio();
+
+      currentAudio = new Audio(url);
+      currentPlayingCard = card;
+      btn.classList.add("playing");
+      btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+
+      currentAudio.addEventListener("timeupdate", () => {
+        if (!currentAudio || currentPlayingCard !== card) return;
+        const pct = (currentAudio.currentTime / (currentAudio.duration || 1)) * 100;
+        if (progressFill) progressFill.style.width = `${pct}%`;
+        if (timeDisplay) timeDisplay.textContent = formatTime(currentAudio.currentTime);
+      });
+
+      currentAudio.addEventListener("ended", () => {
+        stopGlobalAudio();
+        if (progressFill) progressFill.style.width = "0%";
+        if (timeDisplay) timeDisplay.textContent = "0:00";
+      });
+
+      currentAudio.addEventListener("error", () => {
+        stopGlobalAudio();
+        state.lastNotice = { type: "bad", text: "Ses dosyası oynatılamadı. URL'yi kontrol edin." };
+        renderMessages(validateSounds(state.sounds));
+      });
+
+      currentAudio.play().catch(err => {
+        stopGlobalAudio();
+        state.lastNotice = { type: "bad", text: `Oynatma hatası: ${err.message}` };
+        renderMessages(validateSounds(state.sounds));
+      });
+    }
+
+    function seekAudio(playerEl, clickX) {
+      const card = playerEl.closest(".sound-card");
+      if (!currentAudio || currentPlayingCard !== card) return;
+      const progressContainer = playerEl.querySelector(".custom-progress-container");
+      if (!progressContainer) return;
+      const rect = progressContainer.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (clickX - rect.left) / rect.width));
+      currentAudio.currentTime = pct * (currentAudio.duration || 0);
+    }
+
+    els.soundsGrid.addEventListener("click", (event) => {
+      if (event.target.closest("#addSoundCard")) {
+        const fileInput = document.querySelector("#newCardFileInput");
+        if (fileInput) fileInput.click();
+        return;
+      }
+
+      const audioActionEl = event.target.closest("[data-action='toggle-audio'], [data-action='seek-audio']");
+      if (audioActionEl) {
+        const playerEl = audioActionEl.closest(".custom-audio-player");
+        if (audioActionEl.dataset.action === "toggle-audio") {
+          toggleAudioPlay(playerEl);
+        } else if (audioActionEl.dataset.action === "seek-audio") {
+          seekAudio(playerEl, event.clientX);
+        }
+        return;
+      }
+
+      const action = event.target.closest("[data-action]")?.dataset.action;
+      if (!action) return;
+      if (action === "drag") return;
+      const card = event.target.closest(".sound-card[data-index]");
+      if (!card) return;
+      const index = Number(card.dataset.index);
+
+      if (action === "move-up") moveSound(index, -1);
+      if (action === "move-down") moveSound(index, 1);
+      if (action === "toggle-lock") {
+        const sound = state.sounds[index];
+        if (sound) {
+          updateSound(index, "isLocked", !sound.isLocked);
+          renderGrid();
+        }
+      }
+      if (action === "translate") translateSound(index);
+      if (action === "sync-tr") syncTurkishTranslation(index);
+      if (action === "duplicate") duplicateSound(index);
+      if (action === "delete") deleteSound(index);
+    });
+
+    els.soundsGrid.addEventListener("change", async (event) => {
+      if (event.target.id === "newCardFileInput") {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        event.target.value = "";
+        await handleAudioUploadNewSound(file);
+      }
+    });
+
+    // Desktop Drag & Drop Sorting with Live Dropzone Placeholder
+    let dropPlaceholder = document.createElement("div");
+    dropPlaceholder.className = "drop-placeholder";
+    dropPlaceholder.innerHTML = `<i class="fa-solid fa-arrow-down-long" style="font-size: 20px;"></i> <span>Buraya Taşınacak</span>`;
+
+    let currentTargetIndex = null;
+    let currentPosition = "before";
+
+    els.soundsGrid.addEventListener("dragstart", (event) => {
+      if (["INPUT", "SELECT", "TEXTAREA", "BUTTON", "LABEL"].includes(event.target.tagName)) {
+        if (!event.target.classList.contains("drag-handle")) {
+          event.preventDefault();
+          return;
+        }
+      }
+
+      const card = event.target.closest(".sound-card[data-index]");
+      if (!card) return;
+
+      state.draggedIndex = Number(card.dataset.index);
+      card.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", String(state.draggedIndex));
+    });
+
+    els.soundsGrid.addEventListener("dragover", (event) => {
+      if (state.draggedIndex === null) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      const card = event.target.closest(".sound-card[data-index]");
+      if (!card || card.classList.contains("dragging")) return;
+
+      const rect = card.getBoundingClientRect();
+      const isAfter = event.clientX > rect.left + rect.width / 2;
+      currentPosition = isAfter ? "after" : "before";
+      currentTargetIndex = Number(card.dataset.index);
+
+      if (isAfter) {
+        card.after(dropPlaceholder);
+      } else {
+        card.before(dropPlaceholder);
+      }
+    });
+
+    els.soundsGrid.addEventListener("drop", (event) => {
+      if (state.draggedIndex === null) return;
+      event.preventDefault();
+
+      if (currentTargetIndex !== null && currentTargetIndex !== state.draggedIndex) {
+        let insertIndex = currentTargetIndex + (currentPosition === "after" ? 1 : 0);
+        const [movedSound] = state.sounds.splice(state.draggedIndex, 1);
+        if (state.draggedIndex < insertIndex) {
+          insertIndex -= 1;
+        }
+        state.sounds.splice(insertIndex, 0, movedSound);
+
+        state.lastNotice = { type: "good", text: `"${movedSound.title || movedSound.id}" yeni sırasına taşındı.` };
+        persistDraft();
+      }
+
+      cleanupDragState();
+      render();
+    });
+
+    els.soundsGrid.addEventListener("dragend", () => {
+      cleanupDragState();
+    });
+
+    function cleanupDragState() {
+      state.draggedIndex = null;
+      currentTargetIndex = null;
+      if (dropPlaceholder.parentNode) {
+        dropPlaceholder.parentNode.removeChild(dropPlaceholder);
+      }
+      els.soundsGrid.querySelectorAll(".dragging").forEach(c => c.classList.remove("dragging"));
+    }
+
+    els.validateButton.addEventListener("click", () => {
+      state.lastNotice = { type: "good", text: "Eksik alan yok." };
+      renderMessages(validateSounds(state.sounds));
+    });
+
+    els.searchInput.addEventListener("input", renderGrid);
+    els.categoryFilter.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-value]");
+      if (!button) return;
+      setSegmentValue(els.categoryFilter, button.dataset.value);
+      renderGrid();
+    });
+
+    els.lockFilter.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-value]");
+      if (!button) return;
+      setSegmentValue(els.lockFilter, button.dataset.value);
+      renderGrid();
+    });
+
+    els.soundsGrid.addEventListener("toggle", (event) => {
+      if (event.target.classList.contains("translations-details")) {
+        const index = Number(event.target.dataset.index);
+        if (event.target.open) {
+          state.openTranslationsIndex = index;
+          els.soundsGrid.querySelectorAll(".translations-details").forEach(details => {
+            if (details !== event.target && details.open) {
+              details.open = false;
+            }
+          });
+        } else {
+          if (state.openTranslationsIndex === index) {
+            state.openTranslationsIndex = null;
+          }
+        }
+      }
+    }, true);
+
+    async function handlePublish() {
+      if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+        if (!confirm("Yerel ağ üzerinden (LAN) canlı Firebase Storage soundlist.json dosyasını güncellemek istediğinizden emin misiniz?")) {
+          return;
+        }
+      }
+
+      const originalText = els.publishButton.innerHTML;
+      els.publishButton.disabled = true;
+      els.publishButton.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Yayınlanıyor...`;
+      if (els.mobilePublishBtn) {
+        els.mobilePublishBtn.disabled = true;
+        els.mobilePublishBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Yayınlanıyor...`;
+      }
+
+      try {
+        /* Relative URL for cross-device & LAN compatibility */
+        const response = await fetch("/api/publish", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(state.sounds, null, 2),
+        });
+
+        const data = await response.json();
+        if (!response.ok || data.error) {
+          throw new Error(data.error || `HTTP ${response.status}`);
+        }
+
+        state.lastNotice = { type: "good", text: "🔥 soundlist.json yerel dosyaya kaydedildi ve Firebase Storage'a başarıyla yüklendi!" };
+        renderMessages(validateSounds(state.sounds));
+      } catch (error) {
+        state.lastNotice = {
+          type: "bad",
+          text: `Firebase'e yüklenemedi: Sunucunun açık olduğundan emin olun. Hata: ${error.message}`
+        };
+        renderMessages(validateSounds(state.sounds));
+      } finally {
+        els.publishButton.disabled = false;
+        els.publishButton.innerHTML = originalText;
+        if (els.mobilePublishBtn) {
+          els.mobilePublishBtn.disabled = false;
+          els.mobilePublishBtn.innerHTML = `<i class="fa-solid fa-fire"></i> Yayınla`;
+        }
+      }
+    }
+
+    els.publishButton.addEventListener("click", handlePublish);
+    if (els.mobilePublishBtn) els.mobilePublishBtn.addEventListener("click", handlePublish);
+
+    els.guideButton.addEventListener("click", () => {
+      els.guidePanel.hidden = !els.guidePanel.hidden;
+      if (!els.guidePanel.hidden) {
+        els.guidePanel.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+
+    els.closeGuideButton.addEventListener("click", () => {
+      els.guidePanel.hidden = true;
+    });
+
+    // Full-page Audio Drag & Drop Handler
+    let dragCounter = 0;
+    const pageOverlay = document.querySelector("#pageDropOverlay");
+
+    window.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.types && Array.from(e.dataTransfer.types).includes("Files")) {
+        dragCounter++;
+        pageOverlay.classList.add("active");
+      }
+    });
+
+    window.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
+    window.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
+        pageOverlay.classList.remove("active");
+      }
+    });
+
+    async function handleAudioUploadNewSound(file) {
+      state.lastNotice = { type: "good", text: `🎵 ${file.name} Firebase Storage'a yükleniyor...` };
+      renderMessages(validateSounds(state.sounds));
+
+      try {
+        /* Relative URL for cross-device & LAN compatibility */
+        const response = await fetch("/api/upload-audio", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/octet-stream",
+            "x-file-name": encodeURIComponent(file.name),
+          },
+          body: file,
+        });
+
+        const data = await response.json();
+        if (!response.ok || data.error) {
+          throw new Error(data.error || `HTTP ${response.status}`);
+        }
+
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+        const id = uniqueId(nameWithoutExt);
+        const rawTitle = nameWithoutExt
+          .replace(/[-_]+/g, " ")
+          .replace(/\b\w/g, char => char.toUpperCase());
+
+        const newSound = {
+          id,
+          title: rawTitle,
+          icon: "music",
+          url: data.url,
+          isLocked: false,
+          category: "nature",
+          titleTranslations: normalizeTitleTranslations(null, rawTitle),
+        };
+
+        state.sounds.push(newSound);
+        const newIndex = state.sounds.length - 1;
+
+        state.lastNotice = { type: "good", text: `🎉 ${file.name} eklendi! Başlığını düzenleyebilirsiniz.` };
+        persistDraft();
+        render();
+
+        const cardEl = els.soundsGrid.querySelector(`.sound-card[data-index="${newIndex}"]`);
+        if (cardEl) {
+          cardEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          const titleInput = cardEl.querySelector(`input[data-field="title"]`);
+          if (titleInput) {
+            setTimeout(() => {
+              titleInput.focus();
+              titleInput.select();
+            }, 150);
+          }
+        }
+      } catch (error) {
+        state.lastNotice = {
+          type: "bad",
+          text: `${file.name} yüklenemedi: Sunucunun açık olduğundan emin olun. Hata: ${error.message}`
+        };
+        renderMessages(validateSounds(state.sounds));
+      }
+    }
+
+    window.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      dragCounter = 0;
+      pageOverlay.classList.remove("active");
+
+      const files = Array.from(e.dataTransfer?.files || []).filter(file =>
+        /\.(mp3|m4a|wav|aac|ogg|flac)$/i.test(file.name) || file.type.startsWith("audio/")
+      );
+
+      if (files.length === 0) return;
+
+      const targetCard = e.target.closest(".sound-card[data-index]");
+      if (targetCard && files.length === 1) {
+        const index = Number(targetCard.dataset.index);
+        const sound = state.sounds[index];
+        const file = files[0];
+
+        if (sound) {
+          const soundTitle = sound.title || sound.id;
+          const confirmMessage = `"${soundTitle}" (ID: ${sound.id}) sesinin dosyasını "${file.name}" ile değiştirmek istediğinizden emin misiniz?`;
+          if (confirm(confirmMessage)) {
+            state.lastNotice = { type: "good", text: `🎵 ${soundTitle} için ${file.name} Firebase Storage'a yükleniyor...` };
+            renderMessages(validateSounds(state.sounds));
+
+            try {
+              /* Relative URL for cross-device & LAN compatibility */
+              const response = await fetch("/api/upload-audio", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/octet-stream",
+                  "x-file-name": encodeURIComponent(file.name),
+                },
+                body: file,
+              });
+
+              const data = await response.json();
+              if (!response.ok || data.error) throw new Error(data.error || `HTTP ${response.status}`);
+
+              updateSound(index, "url", data.url);
+              state.lastNotice = { type: "good", text: `🎉 "${soundTitle}" ses dosyası "${file.name}" ile başarıyla güncellendi!` };
+              renderGrid();
+              return;
+            } catch (error) {
+              state.lastNotice = {
+                type: "bad",
+                text: `Ses dosyası yüklenemedi: ${error.message}`
+              };
+              renderMessages(validateSounds(state.sounds));
+              return;
+            }
+          } else {
+            return;
+          }
+        }
+      }
+
+      for (let i = 0; i < files.length; i++) {
+        await handleAudioUploadNewSound(files[i]);
+      }
+    });
+
+    restoreDraft();
+    render();
+  </script>
+</body>
+
+</html>

@@ -1,22 +1,25 @@
 import React from 'react';
 import {
   TouchableOpacity,
-  StyleSheet,
   View,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacityProps,
   StyleProp,
   ViewStyle,
-  TouchableOpacityProps,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import AppText from './AppText';
-import { colors } from '../theme/colors';
-import { layout } from '../theme/layout';
-
-export type AppButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'gradient';
+import { colors, component, spacing, radius } from '../theme/tokens';
+export type AppButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'danger'
+  | 'gradient';
 export type AppButtonSize = 'large' | 'medium' | 'small';
-
-interface AppButtonProps extends TouchableOpacityProps {
+interface Props extends TouchableOpacityProps {
   title?: string;
   variant?: AppButtonVariant;
   size?: AppButtonSize;
@@ -26,9 +29,10 @@ interface AppButtonProps extends TouchableOpacityProps {
   fullWidth?: boolean;
   children?: React.ReactNode;
   gradientColors?: string[];
+  iconColor?: string;
+  loading?: boolean;
 }
-
-const AppButton: React.FC<AppButtonProps> = ({
+export default function AppButton({
   title,
   variant = 'primary',
   size = 'large',
@@ -37,145 +41,110 @@ const AppButton: React.FC<AppButtonProps> = ({
   style,
   fullWidth = true,
   disabled,
+  loading,
   children,
   gradientColors,
+  iconColor,
+  accessibilityState,
   ...props
-}) => {
-  const getContainerStyles = () => {
-    let height = 64;
-    let padding = layout.padding.button;
-
-    switch (size) {
-      case 'small':
-        height = 40;
-        padding = layout.padding.buttonSmall;
-        break;
-      case 'medium':
-        height = 48;
-        padding = layout.padding.button;
-        break;
-      case 'large':
-      default:
-        height = 64;
-        break;
-    }
-
-    return [
-      styles.baseContainer,
-      { height, paddingHorizontal: padding },
-      fullWidth && styles.fullWidth,
-    ];
-  };
-
-  const getBackgroundContent = (innerContent: React.ReactNode) => {
-    switch (variant) {
-      case 'gradient':
-        return (
-          <LinearGradient
-            colors={gradientColors || colors.accent.orangeGradient} // Common gradient for main call to actions
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[...getContainerStyles(), disabled && styles.disabled]}
+}: Props) {
+  const unavailable = disabled || loading;
+  const textColor =
+    variant === 'primary' ? colors.text.dark : colors.text.primary;
+  const content = (
+    <View style={styles.content}>
+      {loading ? (
+        <ActivityIndicator color={textColor} />
+      ) : icon && iconPosition === 'left' ? (
+        <Icon
+          name={icon}
+          size={component.iconSize.small}
+          color={iconColor || textColor}
+          solid
+        />
+      ) : null}
+      {children ||
+        (title ? (
+          <AppText
+            variant={size === 'small' ? 'small' : 'body'}
+            weight="bold"
+            color={textColor}
+            align="center"
+            style={styles.label}
           >
-            {innerContent}
-          </LinearGradient>
-        );
-      case 'ghost':
-        return (
-          <View style={[...getContainerStyles(), styles.ghost, disabled && styles.disabled]}>
-            {innerContent}
-          </View>
-        );
-      case 'danger':
-        return (
-          <View style={[...getContainerStyles(), { backgroundColor: colors.accent.danger }, disabled && styles.disabled]}>
-            {innerContent}
-          </View>
-        );
-      case 'secondary':
-        return (
-          <View style={[...getContainerStyles(), styles.secondary, disabled && styles.disabled]}>
-            {innerContent}
-          </View>
-        );
-      case 'primary':
-      default:
-        return (
-          <View style={[...getContainerStyles(), { backgroundColor: colors.accent.success }, disabled && styles.disabled]}>
-            {innerContent}
-          </View>
-        );
-    }
-  };
-
-  const getTextColor = () => {
-    if (disabled) return 'secondary';
-    if (variant === 'ghost' || variant === 'secondary') return 'primary';
-    return 'primary'; // All solid buttons use primary (white) text
-  };
-  
-  const actualTextColor = getTextColor();
-
+            {title}
+          </AppText>
+        ) : null)}
+      {!loading && icon && iconPosition === 'right' && (
+        <Icon
+          name={icon}
+          size={component.iconSize.small}
+          color={iconColor || textColor}
+          solid
+        />
+      )}
+    </View>
+  );
+  const surface = [
+    styles.surface,
+    {
+      minHeight: Math.max(component.touchTarget, component.buttonHeight[size]),
+    },
+  ];
+  const backgroundColor =
+    variant === 'primary'
+      ? colors.accent.success
+      : variant === 'danger'
+      ? colors.accent.danger
+      : variant === 'secondary'
+      ? colors.glass.buttonSecondary
+      : 'transparent';
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
-      style={[fullWidth ? styles.fullWidth : undefined, style]}
-      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityState={{
+        ...accessibilityState,
+        disabled: !!unavailable,
+        busy: !!loading,
+      }}
+      activeOpacity={0.75}
       {...props}
+      disabled={unavailable}
+      style={[
+        fullWidth && styles.fullWidth,
+        unavailable && styles.disabled,
+        style,
+      ]}
     >
-      {getBackgroundContent(
-        <View style={styles.content}>
-          {children ? (
-            children
-          ) : (
-            <>
-              {icon && iconPosition === 'left' && (
-                <Icon name={icon} size={size === 'small' ? 14 : 18} color={colors.text[actualTextColor as keyof typeof colors.text]} solid />
-              )}
-              {title && (
-                <AppText
-                  variant={size === 'small' ? 'small' : 'large'}
-                  weight="bold"
-                  color={actualTextColor}
-                >
-                  {title}
-                </AppText>
-              )}
-              {icon && iconPosition === 'right' && (
-                <Icon name={icon} size={size === 'small' ? 14 : 18} color={colors.text[actualTextColor as keyof typeof colors.text]} solid />
-              )}
-            </>
-          )}
-        </View>
+      {variant === 'gradient' ? (
+        <LinearGradient
+          colors={gradientColors || colors.accent.orangeGradient}
+          style={surface}
+        >
+          {content}
+        </LinearGradient>
+      ) : (
+        <View style={[surface, { backgroundColor }]}>{content}</View>
       )}
     </TouchableOpacity>
   );
-};
-
+}
 const styles = StyleSheet.create({
-  fullWidth: {
-    width: '100%',
-  },
-  baseContainer: {
-    borderRadius: layout.radius.xl,
+  fullWidth: { width: '100%' },
+  surface: {
+    borderRadius: radius.xl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: layout.spacing.sm,
+    justifyContent: 'center',
+    gap: spacing.sm,
+    maxWidth: '100%',
   },
-  secondary: {
-    backgroundColor: colors.glass.buttonSecondary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
+  label: { flexShrink: 1 },
+  disabled: { opacity: 0.5 },
 });
-
-export default AppButton;

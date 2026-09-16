@@ -1,13 +1,21 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, StyleProp, ViewStyle, TouchableOpacityProps } from 'react-native';
+import {
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacityProps,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
-import { colors } from '../theme/colors';
+import { colors, component } from '../theme/tokens';
 
 export type IconButtonVariant = 'ghost' | 'glass' | 'solid';
 export type IconButtonSize = 'large' | 'medium' | 'small';
 
 interface IconButtonProps extends TouchableOpacityProps {
   name: string;
+  loading?: boolean;
   variant?: IconButtonVariant;
   size?: IconButtonSize;
   iconColor?: string;
@@ -21,23 +29,31 @@ const IconButton: React.FC<IconButtonProps> = ({
   iconColor = colors.text.primary,
   style,
   disabled,
+  loading,
+  accessibilityState,
   ...props
 }) => {
   const getContainerSize = () => {
     switch (size) {
-      case 'small': return 32;
-      case 'large': return 56;
+      case 'small':
+        return component.touchTarget;
+      case 'large':
+        return component.iconButtonLarge;
       case 'medium':
-      default: return 44;
+      default:
+        return component.touchTarget;
     }
   };
 
   const getIconSize = () => {
     switch (size) {
-      case 'small': return 16;
-      case 'large': return 28;
+      case 'small':
+        return component.iconSize.small;
+      case 'large':
+        return component.iconSize.large;
       case 'medium':
-      default: return 24;
+      default:
+        return component.iconSize.medium;
     }
   };
 
@@ -57,18 +73,37 @@ const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <TouchableOpacity
+      accessibilityRole="button"
       activeOpacity={0.7}
       style={[
         styles.container,
-        { width: containerSize, height: containerSize, borderRadius: containerSize / 2 },
+        {
+          width: containerSize,
+          height: containerSize,
+          borderRadius: containerSize / 2,
+        },
         getBackgroundStyle(),
         disabled && styles.disabled,
         style,
       ]}
-      disabled={disabled}
+      accessibilityState={{
+        ...accessibilityState,
+        disabled: !!(disabled || loading),
+        busy: !!loading,
+      }}
+      disabled={disabled || loading}
       {...props}
     >
-      <Icon name={name} size={getIconSize()} color={disabled ? colors.text.secondary : iconColor} solid />
+      {loading ? (
+        <ActivityIndicator color={iconColor} />
+      ) : (
+        <Icon
+          name={name}
+          size={getIconSize()}
+          color={disabled ? colors.text.secondary : iconColor}
+          solid
+        />
+      )}
     </TouchableOpacity>
   );
 };

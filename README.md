@@ -82,6 +82,49 @@ You've successfully run and modified your React Native App. :partying_face:
 - If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
 - If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
 
+# Android Release & Signing Configurations
+
+This project enforces strict checks to ensure release builds are signed using production upload keys rather than debug credentials.
+
+## Step 1: Configure Signing & Versioning Properties
+
+Create or edit your local `android/gradle.properties` (or the global `~/.gradle/gradle.properties`) to include the following configuration:
+
+```properties
+MYAPP_RELEASE_STORE_FILE=your-release-key.keystore
+MYAPP_RELEASE_KEY_ALIAS=your-key-alias
+MYAPP_RELEASE_STORE_PASSWORD=your-store-password
+MYAPP_RELEASE_KEY_PASSWORD=your-key-password
+MYAPP_VERSION_CODE=1
+```
+
+Ensure `your-release-key.keystore` is placed in the `android/app` directory (or specify a correct relative path).
+
+> [!IMPORTANT]
+> - `versionName` is automatically synchronized with the `version` field in `package.json`.
+> - `MYAPP_VERSION_CODE` represents the Android `versionCode` property. It defaults to `1` if not provided, and must be a positive integer. **You must increment this integer on every release upload to Google Play.**
+
+> [!WARNING]
+> Do NOT commit keystore credentials or the `.keystore` file to Git. The project contains a `.gitignore` to prevent tracking these files.
+
+## Step 2: Build Release Bundle (AAB)
+
+To compile the release bundle (AAB) for upload to Google Play, run:
+
+```sh
+cd android
+./build_release_bundle.sh
+```
+
+## Step 3: Build Release APK (For Testing)
+
+To compile and install a release build directly on a connected device, run:
+
+```sh
+cd android
+./build_apk.sh
+```
+
 # Troubleshooting
 
 If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.

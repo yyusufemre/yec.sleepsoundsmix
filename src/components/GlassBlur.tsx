@@ -20,7 +20,7 @@ interface GlassBlurProps {
  */
 const GlassBlur: React.FC<GlassBlurProps> = ({
   style,
-  blurAmount = 15,
+  blurAmount = 32,
   fallbackColor = 'rgba(0,0,0,0.8)',
   children,
 }) => {

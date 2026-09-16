@@ -1,23 +1,31 @@
+import AppText from '../components/AppText';
+import useReducedMotion from '../hooks/useReducedMotion';
 import React, { useEffect, useRef } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { Animated, Easing, StyleSheet, KeyboardAvoidingView, Platform, useWindowDimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
-import LibraryScreen from '../screens/LibraryScreen';
-import MixerScreen from '../screens/MixerScreen';
-import TimerScreen from '../screens/TimerScreen';
-import PresetsScreen from '../screens/PresetsScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import MiniPlayer from '../components/MiniPlayer';
+import AppTabBar from '../layout/AppTabBar';
+import { colors, component, spacing, fontFamily } from '../theme/tokens';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassBlur from '../components/GlassBlur';
 
 const Tab = createBottomTabNavigator();
 
+const getLibraryScreen = () => require('../screens/LibraryScreen').default;
+const getTimerScreen = () => require('../screens/TimerScreen').default;
+const getMixerScreen = () => require('../screens/MixerScreen').default;
+const getPresetsScreen = () => require('../screens/PresetsScreen').default;
+const getSettingsScreen = () => require('../screens/SettingsScreen').default;
+
 const AnimatedTabIcon = ({ name, color, size, focused, routeName }: any) => {
+  const reducedMotion = useReducedMotion();
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (reducedMotion) {animatedValue.setValue(0); return;} 
     if (focused) {
       // Trigger animation when focused
       Animated.sequence([
@@ -42,7 +50,7 @@ const AnimatedTabIcon = ({ name, color, size, focused, routeName }: any) => {
         useNativeDriver: true,
       }).start();
     }
-  }, [animatedValue, focused]);
+  }, [animatedValue, focused, reducedMotion]);
 
   // Define specific transformations based on routeName
   const getTransform = () => {
@@ -160,11 +168,23 @@ const getTabBarIcon = (
   );
 };
 
+const renderTabLabel = ({color, children}: {color: string; children: string}) => <AppText color={color} align="center" variant="tiny" style={tabLabelStyle}>{children}</AppText>;
+const tabLabelStyle = {fontSize: component.tabLabelSize, lineHeight: 14};
+
+const renderAppTabBar = (props: BottomTabBarProps) => <AppTabBar {...props} />;
+
+const TabBarBackground = () => <GlassBlur fallbackColor={colors.navigation.background} />;
+
 const AppNavigator = () => {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const { fontScale } = useWindowDimensions();
+
   return (
     <NavigationContainer theme={navTheme}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <Tab.Navigator
+          tabBar={renderAppTabBar}
           screenOptions={({ route }) => ({
             headerShown: false,
             sceneStyle: {
@@ -174,22 +194,18 @@ const AppNavigator = () => {
               backgroundColor: 'rgba(25, 32, 43, 0.75)',
               borderTopWidth: 0,
               elevation: 0,
-              height: 80,
-              paddingBottom: 20,
-              paddingTop: 10,
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
+              height: Math.max(component.tabBarMinHeight, 40 + 28 * fontScale) + insets.bottom,
+              paddingBottom: Math.max(insets.bottom, spacing.sm),
+              paddingTop: spacing.sm,
             },
-            tabBarBackground: () => (
-              <GlassBlur fallbackColor="#19202B" />
-            ),
-            tabBarActiveTintColor: '#FFFFFF',
-            tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.2)',
+            tabBarBackground: TabBarBackground,
+            tabBarLabelPosition: 'below-icon',
+            tabBarLabel: renderTabLabel,
+            tabBarActiveTintColor: colors.text.primary,
+            tabBarInactiveTintColor: colors.navigation.inactiveIcon,
             tabBarLabelStyle: {
-              fontSize: 11,
-              fontFamily: 'Inter-Medium',
+              fontSize: component.tabLabelSize,
+              fontFamily: fontFamily.medium,
               fontWeight: '500',
               marginTop: 6,
             },
@@ -202,32 +218,31 @@ const AppNavigator = () => {
         >
           <Tab.Screen
             name="Library"
-            component={LibraryScreen}
-            options={{ tabBarLabel: 'Tüm Sesler' }}
+            getComponent={getLibraryScreen}
+            options={{ title: t('navigation.library') }}
           />
           <Tab.Screen
             name="Timer"
-            component={TimerScreen}
-            options={{ tabBarLabel: 'Zamanla' }}
+            getComponent={getTimerScreen}
+            options={{ title: t('navigation.timer') }}
           />
           <Tab.Screen
             name="Mixer"
-            component={MixerScreen}
-            options={{ tabBarLabel: 'Mixle' }}
+            getComponent={getMixerScreen}
+            options={{ title: t('navigation.mixer') }}
           />
           <Tab.Screen
             name="Presets"
-            component={PresetsScreen}
-            options={{ tabBarLabel: 'Hazır Mix' }}
+            getComponent={getPresetsScreen}
+            options={{ title: t('navigation.presets') }}
           />
           <Tab.Screen
             name="Settings"
-            component={SettingsScreen}
-            options={{ tabBarLabel: 'Ayarlar' }}
+            getComponent={getSettingsScreen}
+            options={{ title: t('navigation.settings') }}
           />
         </Tab.Navigator>
-        <MiniPlayer />
-      </View>
+      </KeyboardAvoidingView>
     </NavigationContainer>
   );
 };

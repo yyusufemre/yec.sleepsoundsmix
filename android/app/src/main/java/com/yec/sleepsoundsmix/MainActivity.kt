@@ -1,11 +1,30 @@
 package com.yec.sleepsoundsmix
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory
+import com.zoontek.rnbootsplash.RNBootSplash
 
 class MainActivity : ReactActivity() {
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
+    RNBootSplash.init(this, R.style.BootTheme)
+    window.setBackgroundDrawable(ColorDrawable(Color.parseColor("#0d1319")))
+    super.onCreate(savedInstanceState)
+  }
+
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    super.onWindowFocusChanged(hasFocus)
+    if (hasFocus && NativeFullscreenModule.isImmersiveEnabled()) {
+      NativeFullscreenModule.applyImmersive(window.decorView)
+    }
+  }
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule

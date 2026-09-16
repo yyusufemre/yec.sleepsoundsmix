@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, TextProps } from 'react-native';
+import { Text, TextProps, TextStyle } from 'react-native';
 import { typography } from '../theme/typography';
 import { colors } from '../theme/colors';
+import { lineHeight } from '../theme/spacing';
 
 export type AppTextVariant = keyof typeof typography.size;
 export type AppTextWeight = keyof typeof typography.family;
@@ -32,7 +33,9 @@ const AppText: React.FC<AppTextProps> = ({
       style={[
         {
           fontFamily: typography.family[weight],
+          fontWeight: typography.weight[weight] as TextStyle['fontWeight'],
           fontSize: typography.size[variant],
+          lineHeight: lineHeight[variant as keyof typeof lineHeight] ?? undefined,
           color: textColor,
           textAlign: align,
         },

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calmix - Privacy Policy & Terms of Service</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary-color: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #c084fc;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 20px;
+        }
+
+        .logo-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Language Switcher Navigation */
+        .nav-container {
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .lang-switch {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .lang-switch button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+        }
+
+        .lang-switch button:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .lang-switch button.active {
+            color: #0f172a;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Policy Card Styling */
+        .policy-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            display: none; /* Controlled by JS */
+        }
+
+        .policy-container.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: var(--accent-color);
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        p, li {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        ul {
+            list-style-position: inside;
+            margin-bottom: 20px;
+            padding-left: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: var(--text-primary);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .policy-container {
+                padding: 24px;
+            }
+            .logo-title {
+                font-size: 2rem;
+            }
+            .lang-switch button {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <header>
+        <div class="logo-title">Calmix</div>
+        <p>Privacy Policy & Terms of Service</p>
+    </header>
+
+    <div class="nav-container">
+        <div class="lang-switch">
+            <button onclick="switchLang('tr')" id="btn-tr" class="active">Türkçe</button>
+            <button onclick="switchLang('en')" id="btn-en">English</button>
+            <button onclick="switchLang('de')" id="btn-de">Deutsch</button>
+            <button onclick="switchLang('es')" id="btn-es">Español</button>
+            <button onclick="switchLang('fr')" id="btn-fr">Français</button>
+            <button onclick="switchLang('pt')" id="btn-pt">Português</button>
+            <button onclick="switchLang('ja')" id="btn-ja">日本語</button>
+        </div>
+    </div>
+
+    <!-- TÜRKÇE -->
+    <div id="lang-tr" class="policy-container active">
+        <h1>Gizlilik Politikası</h1>
+        <p><strong>Son Güncelleme:</strong> 7 Haziran 2026</p>
+        <p>Calmix ("biz", "uygulama") olarak gizliliğinize önem veriyoruz. Bu politika, uygulamamızı kullandığınızda verilerinizin nasıl toplandığını, işlendiğini ve korunduğunu açıklar.</p>
+
+        <h2>1. İşlenen Veriler ve Amaçları</h2>
+        <p>Uygulamamız doğrudan adınız, e-posta adresiniz veya telefon numaranız gibi kişisel kimlik bilgilerini toplamaz. Ancak uygulamanın çalışması, hata analizi, bildirim iletimi ve reklam gösterimi için aşağıdaki üçüncü taraf hizmet sağlayıcıları ve teknolojileri kullanıyoruz:</p>
+
+        <h3>A. Google Analytics for Firebase</h3>
+        <p>Uygulama içi etkinliklerinizi, ekran geçişlerini ve kullanım alışkanlıklarını analiz ederek kullanıcı deneyimini iyileştirmek amacıyla kullanılır. Bu süreçte cihaz tanımlayıcıları (Ad ID, IP adresi ve cihaz bilgileri) işlenebilir.</p>
+
+        <h3>B. Firebase Crashlytics</h3>
+        <p>Uygulama içinde meydana gelebilecek çökmeleri ve teknik hataları gidermek amacıyla çökme anındaki sistem bilgilerini, teknik günlükleri (log), işletim sistemi sürümünü ve cihaz modelini işler.</p>
+
+        <h3>C. Google AdMob & Rıza Yönetimi (UMP)</h3>
+        <p>Uygulama içi reklam gösterimi sağlamak amacıyla cihaz tanımlayıcılarını kullanabilir. Avrupa Ekonomik Alanı (EEA) ve Birleşik Krallık'taki kullanıcılarımızın veri paylaşımı ve kişiselleştirilmiş reklam rıza tercihleri, Google UMP (User Messaging Platform) aracılığıyla toplanır ve yönetilir. Kullanıcılar bu rıza tercihlerini uygulamanın Ayarlar ekranındaki "Gizlilik Ayarlarını Yönet" seçeneğinden diledikleri zaman güncelleyebilirler.</p>
+
+        <h3>D. Firebase Cloud Messaging (FCM) & Bildirimler</h3>
+        <p>Size hatırlatıcılar ve bilgilendirmeler gönderebilmek için bildirim izni vermeniz durumunda benzersiz bir FCM Cihaz Token'ı oluşturulur. Bu token yalnızca bildirimlerin doğru cihaza ulaşmasını sağlamak amacıyla işlenir. Uygulama içindeki bildirim seçeneği kapatıldığında bu token'ın silinmesi/geçersiz kılınması için işlem başlatılır. Uygulama cihazdan kaldırıldığında ise token zamanla otomatik olarak geçersiz (inaktif) hale gelebilir.</p>
+
+        <h3>E. Yerel Depolama (AsyncStorage)</h3>
+        <p>Seçtiğiniz sesler, ses seviyeleri ve uygulama tercihleri cihazınızın yerel depolama biriminde (AsyncStorage) saklanır. Ancak, kullanıcı deneyimini iyileştirmek ve kullanım istatistiklerini anlamak amacıyla, seçilen seslerin kimlikleri (ID'leri) ve oluşturulan miks etkinlikleri gibi analitik veriler Firebase Analytics sunucularına güvenli bir şekilde gönderilir. Bunun dışındaki kişisel tercihleriniz ve ses seviyesi gibi yapılandırmalar cihazınızda yerel olarak kalır.</p>
+
+        <h2>2. Veri Saklama Süresi ve Silinmesi</h2>
+        <p>Uygulama içi ayarlarınız cihazınızda saklanır ve uygulamayı sildiğinizde temizlenir. FCM Cihaz Token'ı, uygulama içindeki bildirim seçeneği kapatıldığında silinmeye çalışılır; uygulama cihazdan kaldırıldığında ise zamanla geçersiz hale gelebilir. Analitik veriler ve teknik günlükler Google politikalarına uygun sürelerde saklanır.</p>
+
+        <h2>3. Çocukların Gizliliği</h2>
+        <p>Uygulamamız bilerek 13 yaşın altındaki çocuklardan veriler toplamaz. Eğer 13 yaşından küçük bir çocuğun bize veri aktardığını fark ederseniz lütfen bizimle iletişime geçin.</p>
+
+        <h2>4. Kullanıcı Hakları</h2>
+        <p>GDPR ve ilgili mevzuat uyarınca; verilerinizin toplanıp toplanmadığını öğrenme, rızanızı geri çekme ve kişisel tercihlerinizi UMP paneli üzerinden değiştirme haklarına sahipsiniz.</p>
+
+        <h2>5. İletişim</h2>
+        <p>Gizlilik politikamız hakkında sorularınız için bize ulaşabilirsiniz: <strong>support@yousufe.net</strong></p>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+        <h1>Kullanım Koşulları</h1>
+        <h2>1. Hizmetin Kullanımı</h2>
+        <p>Calmix, kullanıcılara rahatlatıcı doğa ve uyku sesleri sunan bir uygulamadır. Sunulan seslerin ve içeriklerin izinsiz kopyalanması, ticari amaçla dağıtılması yasaktır.</p>
+
+        <h2>2. Kilitli Sesler ve Reklam Modeli</h2>
+        <p>Uygulama içerisindeki bazı kilitli (Premium) sesler, ödüllü reklam izleme karşılığında geçici olarak (1 saatlik süreyle) kullanıma açılır. Bu süreçteki reklam sunumları tamamen Google AdMob politikalarına tabidir.</p>
+
+        <h2>3. Sorumluluk Reddi</h2>
+        <p>Uygulama "olduğu gibi" sunulmakta olup, cihaz uyumsuzlukları veya teknik aksaklıklardan doğabilecek geçici kesintilerden geliştirici sorumlu tutulamaz.</p>
+    </div>
+
+    <!-- ENGLISH -->
+    <div id="lang-en" class="policy-container">
+        <h1>Privacy Policy</h1>
+        <p><strong>Last Updated:</strong> June 7, 2026</p>
+        <p>Calmix ("we", "the app") values your privacy. This policy explains how your data is collected, processed, and protected when you use our app.</p>
+
+        <h2>1. Data Processing and Purposes</h2>
+        <p>Our app does not directly collect personally identifiable information such as your name, email address, or phone number. However, we use the following third-party service providers and technologies for core functionality, crash diagnostics, notifications, and advertising:</p>
+
+        <h3>A. Google Analytics for Firebase</h3>
+        <p>Used to analyze in-app events, screen transitions, and usage habits to improve the user experience. Device identifiers (Ad ID, IP address, and device metadata) may be processed in this scope.</p>
+
+        <h3>B. Firebase Crashlytics</h3>
+        <p>Processes system logs, technical crash logs, operating system versions, and device models at the moment of a crash to troubleshoot application stability.</p>
+
+        <h3>C. Google AdMob & Consent Management (UMP)</h3>
+        <p>May use device identifiers to serve ads. For users in the European Economic Area (EEA) and the United Kingdom, data sharing and personalized ad consent preferences are gathered and managed via Google UMP (User Messaging Platform). Users can modify their consent settings at any time using the "Manage Privacy Settings" option in the app Settings.</p>
+
+        <h3>D. Firebase Cloud Messaging (FCM) & Notifications</h3>
+        <p>If you grant notification permission, a unique FCM Device Token is generated to send reminders and updates. This token is used solely to deliver notifications to the correct device. When the notification option within the app is turned off, a process is initiated to delete/invalidate this token. If the app is uninstalled, the token may eventually become invalid (inactive) over time.</p>
+
+        <h3>E. Local Storage (AsyncStorage)</h3>
+        <p>Your active sounds, volume levels, and application preferences are stored in your device's local storage (AsyncStorage). However, to improve the user experience and analyze usage trends, analytical event data such as selected sound IDs and custom mix activities are securely transmitted to Firebase Analytics servers. Other personal configurations, such as specific volume levels, remain strictly local on your device.</p>
+
+        <h2>2. Data Retention and Deletion</h2>
+        <p>Local settings remain on your device and are cleared when you uninstall the app. An attempt is made to delete/invalidate the FCM Device Token when the notification option within the app is turned off; if the app is uninstalled, the token may become invalid over time. Analytics and crash data are retained in compliance with Google policies.</p>
+
+        <h2>3. Children's Privacy</h2>
+        <p>The app does not knowingly collect data from children under the age of 13. If you become aware that a child under 13 has provided data to us, please contact us.</p>
+
+        <h2>4. User Rights</h2>
+        <p>Under the GDPR and other applicable laws, you have the right to request information about your data processing, revoke consent, and manage your preferences via the UMP consent options.</p>
+
+        <h2>5. Contact</h2>
+        <p>For questions about this privacy policy, contact us at: <strong>support@yousufe.net</strong></p>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+        <h1>Terms of Service</h1>
+        <h2>1. Use of Service</h2>
+        <p>Calmix provides relaxing nature and sleep sounds. Unauthorized copying or commercial distribution of this audio content is prohibited.</p>
+
+        <h2>2. Locked Sounds & Ads</h2>
+        <p>Certain locked (Premium) sounds can be temporarily unlocked (for 1 hour) by watching rewarded ads. Ad delivery is governed by Google AdMob policies.</p>
+
+        <h2>3. Disclaimer</h2>
+        <p>The app is provided "as is," and the developer cannot be held responsible for temporary service interruptions or device incompatibilities.</p>
+    </div>
+
+    <!-- DEUTSCH -->
+    <div id="lang-de" class="policy-container">
+        <h1>Datenschutzerklärung</h1>
+        <p><strong>Zuletzt Aktualisiert:</strong> 7. Juni 2026</p>
+        <p>Calmix ("wir", "die App") legt großen Wert auf Ihre Privatsphäre. Diese Richtlinie erklärt, wie Ihre Daten erfasst, verarbeitet und geschützt werden, wenn Sie unsere App verwenden.</p>
+
+        <h2>1. Datenverarbeitung und Zwecke</h2>
+        <p>Unsere App erfasst keine direkt personenbezogenen Daten wie Name, E-Mail-Adresse oder Telefonnummer. Für die grundlegende Funktionalität, Fehlerdiagnose, Benachrichtigungen und Werbung nutzen wir jedoch die folgenden Drittanbieter und Technologien:</p>
+
+        <h3>A. Google Analytics für Firebase</h3>
+        <p>Analysiert In-App-Ereignisse, Bildschirmetappen und Nutzungsgewohnheiten, um die Benutzererfahrung zu verbessern. Geräte-IDs (Werbe-ID, IP-Adresse und Gerätemetadaten) können in diesem Rahmen verarbeitet werden.</p>
+
+        <h3>B. Firebase Crashlytics</h3>
+        <p>Verarbeitet Systemprotokolle, technische Absturzdaten, Betriebssystemversionen und Gerätemodelle zum Zeitpunkt des Absturzes, um Anwendungsfehler zu beheben.</p>
+
+        <h3>C. Google AdMob & Einwilligungsmanagement (UMP)</h3>
+        <p>Verwendet Geräte-IDs zur Anzeigenschaltung. Für Nutzer im EWR und in Großbritannien werden Werbeeinstellungen über die Google UMP (User Messaging Platform) verwaltet. Sie können diese Einstellungen jederzeit in den App-Einstellungen unter "Datenschutzeinstellungen verwalten" ändern.</p>
+
+        <h3>D. Firebase Cloud Messaging (FCM) & Benachrichtigungen</h3>
+        <p>Wenn Sie Benachrichtigungen zulassen, wird ein eindeutiger FCM-Geräte-Token generiert. Dieses Token wird ausschließlich zur Zustellung von Benachrichtigungen an das richtige Gerät verwendet. Wenn die Benachrichtigungsoption innerhalb der App deaktiviert wird, wird ein Prozess zur Löschung/Ungültigmachung dieses Tokens eingeleitet. Wenn die App deinstalliert wird, kann das Token im Laufe der Zeit ungültig (inaktiv) werden.</p>
+
+        <h3>E. Lokaler Speicher (AsyncStorage)</h3>
+        <p>Ihre aktiven Sounds, Lautstärken und Anwendungseinstellungen werden lokal auf Ihrem Gerät (AsyncStorage) gespeichert. Um jedoch die Benutzererfahrung zu verbessern und Nutzungstrends zu analysieren, werden analytische Ereignisdaten wie ausgewählte Sound-IDs und benutzerdefinierte Mix-Aktivitäten sicher an Firebase Analytics-Server übertragen. Andere persönliche Einstellungen wie die genauen Lautstärken verbleiben ausschließlich lokal auf Ihrem Gerät.</p>
+
+        <h2>2. Aufbewahrung und Löschung von Daten</h2>
+        <p>Lokale Einstellungen verbleiben auf Ihrem Gerät und werden gelöscht, wenn Sie die App deinstallieren. Es wird versucht, das FCM-Geräte-Token zu löschen/ungültig zu machen, wenn die Benachrichtigungsoption innerhalb der App deaktiviert wird; wenn die App deinstalliert wird, kann das Token mit der Zeit ungültig werden. Analysedaten und Absturzprotokolle werden in Übereinstimmung mit den Google-Richtlinien aufbewahrt.</p>
+
+        <h2>3. Schutz der Privatsphäre von Kindern</h2>
+        <p>Die App erfasst wissentlich keine Daten von Kindern unter 13 Jahren. Wenn Sie feststellen, dass ein Kind unter 13 Jahren uns Daten übermittelt hat, kontaktieren Sie uns bitte.</p>
+
+        <h2>4. Rechte der Nutzer</h2>
+        <p>Gemäß der DSGVO und anderen geltenden Gesetzen haben Sie das Recht, Informationen über Ihre Datenverarbeitung anzufordern, Ihre Einwilligung zu widerrufen und Ihre Präferenzen über die UMP-Einwilligungsoptionen zu verwalten.</p>
+
+        <h2>5. Kontakt</h2>
+        <p>Bei Fragen zu dieser Datenschutzerklärung wenden Sie sich an: <strong>support@yousufe.net</strong></p>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+        <h1>Nutzungsbedingungen</h1>
+        <h2>1. Nutzung des Dienstes</h2>
+        <p>Calmix stellt entspannende Natur- und Schlafgeräusche zur Verfügung. Die unbefugte Vervielfältigung oder kommerzielle Verbreitung dieser Audioinhalte ist untersagt.</p>
+
+        <h2>2. Gesperrte Sounds & Werbung</h2>
+        <p>Bestimmte gesperrte (Premium-)Sounds können vorübergehend (für 1 Stunde) freigeschaltet werden, indem belohnte Werbung angesehen wird. Die Anzeigenschaltung unterliegt den Richtlinien von Google AdMob.</p>
+
+        <h2>3. Haftungsausschluss</h2>
+        <p>Die App wird „wie besehen“ zur Verfügung gestellt, und der Entwickler kann nicht für vorübergehende Dienstunterbrechungen oder Geräteinkompatibilitäten haftbar gemacht werden.</p>
+    </div>
+
+    <!-- ESPAÑOL -->
+    <div id="lang-es" class="policy-container">
+        <h1>Política de Privacidad</h1>
+        <p><strong>Última Actualización:</strong> 7 de junio de 2026</p>
+        <p>Calmix ("nosotros", "la aplicación") respeta su privacidad. Esta política detalla cómo procesamos sus datos al utilizar nuestra aplicación.</p>
+
+        <h2>1. Datos Procesados y Finalidades</h2>
+        <p>No recopilamos información de identificación personal directa, como su nombre, correo electrónico o número de teléfono. Sin embargo, integramos servicios de terceros y tecnologías para el análisis de fallos, notificaciones y publicidad:</p>
+
+        <h3>A. Google Analytics para Firebase</h3>
+        <p>Analiza estadísticas de uso e interacciones en la aplicación para optimizar la experiencia del usuario. Los identificadores de dispositivo (Ad ID, dirección IP y metadatos del dispositivo) pueden ser procesados en este ámbito.</p>
+
+        <h3>B. Firebase Crashlytics</h3>
+        <p>Recopila registros de diagnóstico, fallos técnicos, versiones de sistema operativo y modelos de dispositivo en caso de fallos técnicos para corregir errores de estabilidad.</p>
+
+        <h3>C. Google AdMob y Gestión de Consentimiento (UMP)</h3>
+        <p>Utiliza identificadores de dispositivo para mostrar anuncios. En el EEE y el Reino Unido, el consentimiento se gestiona mediante Google UMP (User Messaging Platform). Puede ajustar sus opciones de privacidad en la configuración de la aplicación en "Administrar configuración de privacidad".</p>
+
+        <h3>D. Firebase Cloud Messaging (FCM) y Notificaciones</h3>
+        <p>Si otorga el permiso de notificación, se genera un token de dispositivo FCM único. Este token se utiliza únicamente para entregar notificaciones al dispositivo correcto. Cuando se desactiva la opción de notificación dentro de la aplicación, se inicia un proceso para eliminar/invalidar este token. Si la aplicación se desinstala, el token puede quedar inválido (inactivo) con el tiempo.</p>
+
+        <h3>E. Almacenamiento Local (AsyncStorage)</h3>
+        <p>Sus sonidos activos, niveles de volumen y preferencias del aplicación se guardan localmente en su dispositivo (AsyncStorage). Sin embargo, para mejorar la experiencia del usuario y analizar las tendencias de uso, los datos analíticos de eventos, como los ID de sonido seleccionados y las actividades de mezclas personalizadas, se transmiten de forma segura a los servidores de Firebase Analytics. Otras configuraciones personales, como los niveles de volumen específicos, permanecen estrictamente locales en su dispositivo.</p>
+
+        <h2>2. Retención y Eliminación de Datos</h2>
+        <p>La configuración local permanece en su dispositivo y se borra cuando desinstala la aplicación. Se intenta eliminar/invalidar el token de dispositivo FCM cuando se desactiva la opción de notificación dentro de la aplicación; si la aplicación se desinstala, el token puede quedar inválido con el tiempo. Los datos de análisis y fallos se conservan de acuerdo con las políticas de Google.</p>
+
+        <h2>3. Privacidad de los Niños</h2>
+        <p>La aplicación no recopila a sabiendas datos de niños menores de 13 años. Si tiene conocimiento de que un niño menor de 13 años nos ha facilitado datos, póngase en contacto con nosotros.</p>
+
+        <h2>4. Derechos del Usuario</h2>
+        <p>De acuerdo con el RGPD y otras leyes aplicables, tiene derecho a solicitar información sobre el procesamiento de sus datos, revocar el consentimiento y gestionar sus preferencias a través de las opciones de consentimiento de UMP.</p>
+
+        <h2>5. Contacto</h2>
+        <p>Para dudas sobre esta política de privacidad, contáctenos en: <strong>support@yousufe.net</strong></p>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+        <h1>Términos de Servicio</h1>
+        <h2>1. Uso del Servicio</h2>
+        <p>Calmix ofrece sonidos relajantes de la naturaleza y el sueño. Está prohibida la copia no autorizada o la distribución comercial de este contenido de audio.</p>
+
+        <h2>2. Sonidos Bloqueados y Anuncios</h2>
+        <p>Ciertos sonidos bloqueados (Premium) se pueden desbloquear temporalmente (durante 1 hora) al ver anuncios con recompensa. La entrega de anuncios se rige por las políticas de Google AdMob.</p>
+
+        <h2>3. Descargo de Responsabilidad</h2>
+        <p>La aplicación se proporciona "tal cual", y el desarrollador no se hace responsable de las interrupciones temporales del servicio o de las incompatibilidades del dispositivo.</p>
+    </div>
+
+    <!-- FRANÇAIS -->
+    <div id="lang-fr" class="policy-container">
+        <h1>Politique de Confidentialité</h1>
+        <p><strong>Dernière Mise à Jour :</strong> 7 juin 2026</p>
+        <p>Calmix ("nous", "l'application") respecte votre vie privée. Cette politique décrit la manière dont vos données sont collectées et traitées.</p>
+
+        <h2>1. Données Traitées et Finalités</h2>
+        <p>Nous ne collectons pas directement d'informations personnelles d'identification, telles que votre nom, adresse e-mail ou numéro de téléphone. Cependant, nous utilisons des services tiers et des technologies pour le bon fonctionnement de l'application, l'analyse des plantages, les notifications et la publicité :</p>
+
+        <h3>A. Google Analytics pour Firebase</h3>
+        <p>Mesure l'activité au sein de l'application afin d'en améliorer l'ergonomie et les fonctionnalités. Les identifiants de l'appareil (Ad ID, adresse IP et métadonnées de l'appareil) peuvent être traités dans ce cadre.</p>
+
+        <h3>B. Firebase Crashlytics</h3>
+        <p>Analyse les rapports d'erreurs, les journaux système, les versions de système opératif et les modèles d'appareil lors des plantages pour assurer la stabilité.</p>
+
+        <h3>C. Google AdMob & Gestion du Consentement (UMP)</h3>
+        <p>Affiche des publicités adaptées. Pour l'EEE et le Royaume-Uni, le consentement est géré via la plateforme UMP (User Messaging Platform) de Google. Vous pouvez modifier vos préférences dans les réglages en sélectionnant "Gérer les préférences de confidentialité".</p>
+
+        <h3>D. Firebase Cloud Messaging (FCM) & Notifications</h3>
+        <p>Si vous autorisez les notifications, un jeton de périphérique FCM unique est généré. Ce jeton est utilisé uniquement pour acheminer les notifications vers le bon appareil. Lorsque l'option de notification au sein de l'application est désactivée, un processus est initié pour supprimer/invalider ce jeton. Si l'application est désinstallée, le jeton peut devenir invalide (inactif) avec le temps.</p>
+
+        <h3>E. Stockage Local (AsyncStorage)</h3>
+        <p>Vos sons actifs, niveaux de volume et préférences d'application sont stockés localement sur votre appareil (AsyncStorage). Cependant, pour améliorer l'expérience utilisateur et analyser les tendances d'utilisation, des données analytiques d'événements, telles que les identifiants de sons sélectionnés et les activités de mixage personnalisées, sont transmises de manière sécurisée aux serveurs Firebase Analytics. Les autres configurations personnelles, comme les niveaux de volume spécifiques, restent strictement locales sur votre appareil.</p>
+
+        <h2>2. Conservation et Suppression des Données</h2>
+        <p>Les paramètres locaux restent sur votre appareil et sont effacés lorsque vous désinstallez l'application. Une tentative est faite pour supprimer/invalider le jeton de périphérique FCM lorsque l'option de notification au sein de l'application est désactivée ; si l'application est désinstallée, le jeton peut devenir invalide avec le temps. Les données d'analyse et de plantage sont conservées conformément aux politiques de Google.</p>
+
+        <h2>3. Confidentialité des Enfants</h2>
+        <p>L'application ne collecte pas sciemment de données auprès d'enfants de moins de 13 ans. Si vous apprenez qu'un enfant de moins de 13 ans nous a fourni des données, veuillez nous contacter.</p>
+
+        <h2>4. Droits des Utilisateurs</h2>
+        <p>Conformément au RGPD et aux autres lois applicables, vous avez le droit de demander des informations sur le traitement de vos données, de retirer votre consentement et de gérer vos préférences via les options de consentement de l'UMP.</p>
+
+        <h2>5. Contact</h2>
+        <p>Pour toute question concernant cette politique de confidentialité, contactez-nous à l'adresse suivante : <strong>support@yousufe.net</strong></p>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+        <h1>Conditions d'Utilisation</h1>
+        <h2>1. Utilisation du Service</h2>
+        <p>Calmix propose des sons relaxants de la nature et du sommeil. Toute copie non autorisée ou distribution commerciale de ce contenu audio est interdite.</p>
+
+        <h2>2. Sons Verrouillés et Publicités</h2>
+        <p>Certains sons verrouillés (Premium) peuvent être déverrouillés temporairement (pendant 1 heure) en visionnant des publicités avec récompense. La diffusion des publicités est régie par les politiques de Google AdMob.</p>
+
+        <h2>3. Limitation de Responsabilité</h2>
+        <p>L'application est fournie "en l'état" et le développeur ne peut être tenu responsable des interruptions temporaires de service ou des incompatibilités d'appareil.</p>
+    </div>
+
+    <!-- PORTUGUÊS -->
+    <div id="lang-pt" class="policy-container">
+        <h1>Política de Privacidade</h1>
+        <p><strong>Última Atualização:</strong> 7 de junho de 2026</p>
+        <p>Calmix ("nós", "o aplicativo") valoriza a sua privacidade. Esta política detalha o processamento de dados ao utilizar nosso serviço.</p>
+
+        <h2>1. Dados Processados e Fins</h2>
+        <p>Não coletamos diretamente informações de identificação pessoal, como seu nome, e-mail ou número de telefone. No entanto, serviços de terceiros e tecnologias são integrados para análise técnica, avisos e anúncios:</p>
+
+        <h3>A. Google Analytics para Firebase</h3>
+        <p>Coleta dados de uso, transições de tela e hábitos de navegação para otimizar e melhorar a experiência do usuário. Os identificadores de dispositivo (Ad ID, endereço IP e metadados do dispositivo) podem ser processados neste escopo.</p>
+
+        <h3>B. Firebase Crashlytics</h3>
+        <p>Registra relatórios de falhas, registros do sistema, versões de sistema operacional e modelos de dispositivo no momento de uma falha para corrigir erros de estabilidade.</p>
+
+        <h3>C. Google AdMob e Gestão de Consentimento (UMP)</h3>
+        <p>Identificadores de anúncios são usados para veiculação publicitária. No EEE e Reino Unido, a UMP (User Messaging Platform) gerencia as escolhas de consentimento. O usuário pode gerenciar estas preferências no menu Configurações clicando em "Gerenciar Configurações de Privacidade".</p>
+
+        <h3>D. Firebase Cloud Messaging (FCM) e Notificações</h3>
+        <p>Se você conceder permissão, um token de dispositivo FCM exclusivo é gerado. Esse token é usado exclusivamente para entregar notificações ao dispositivo correto. Quando a opção de notificação dentro do aplicativo é desativada, inicia-se um processo para excluir/invalidar esse token. Se o aplicativo for desinstalado, o token poderá se tornar inválido (inativo) com o tempo.</p>
+
+        <h3>E. Armazenamento Local (AsyncStorage)</h3>
+        <p>Seus sons ativos, níveis de volume e preferências do aplicativo são armazenados localmente no seu dispositivo (AsyncStorage). No entanto, para melhorar a experiência do usuário e analisar tendências de uso, dados analíticos de eventos, como IDs de sons selecionados e atividades de mixagens personalizadas, são transmitidos de forma segura para os servidores do Firebase Analytics. Outras configurações pessoais, como níveis de volume específicos, permanecem estritamente locais no seu dispositivo.</p>
+
+        <h2>2. Retenção e Exclusão de Dados</h2>
+        <p>As configurações locais permanecem no seu dispositivo e são apagadas quando você desinstala o aplicativo. Uma tentativa é feita para excluir/invalidar o Token de Dispositivo FCM quando a opção de notificação dentro do aplicativo é desativada; se o aplicativo for desinstalado, o token poderá se tornar inválido com o tempo. Os dados de análise e falhas são retidos de acordo com as políticas do Google.</p>
+
+        <h2>3. Privacidade das Crianças</h2>
+        <p>O aplicativo não coleta intencionalmente dados de crianças menores de 13 anos. Se você souber que uma criança menor de 13 anos nos forneceu dados, entre em contato conosco.</p>
+
+        <h2>4. Direitos dos Usuários</h2>
+        <p>De acordo com a LGPD, GDPR e outras leis aplicáveis, você tem o direito de solicitar informações sobre o processamento de seus dados, revogar o consentimento e gerenciar suas preferências por meio das opções de consentimento da UMP.</p>
+
+        <h2>5. Contato</h2>
+        <p>Para dúvidas sobre esta política de privacidade, entre em contato por e-mail: <strong>support@yousufe.net</strong></p>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+        <h1>Termos de Serviço</h1>
+        <h2>1. Uso do Serviço</h2>
+        <p>Calmix oferece sons relaxantes da natureza e do sono. A cópia não autorizada ou distribuição comercial deste conteúdo de áudio é proibida.</p>
+
+        <h2>2. Sons Bloqueados e Anúncios</h2>
+        <p>Certos sons bloqueados (Premium) podem be desbloqueados temporariamente (por 1 hora) assistindo a anúncios premiados. A veiculação de anúncios é regida pelas políticas do Google AdMob.</p>
+
+        <h2>3. Isenção de Responsabilidade</h2>
+        <p>O aplicativo é fornecido "como está" e o desenvolvedor não pode ser responsabilizado por interrupções temporárias de serviço ou incompatibilidades de dispositivos.</p>
+    </div>
+
+    <!-- 日本語 -->
+    <div id="lang-ja" class="policy-container">
+        <h1>プライバシーポリシー</h1>
+        <p><strong>最終更新日:</strong> 2026年6月7日</p>
+        <p>Calmix（以下「当アプリ」）は、ユーザーのプライバシーを尊重します。当ポリシーは、当アプリ利用時のデータ取り扱いについて説明するものです。</p>
+
+        <h2>1. 取得データと利用目的</h2>
+        <p>当アプリは、氏名、メールアドレス、電話番号などの直接的な個人情報を収集しません。ただし、アプリの基本機能、エラー分析、通知送信、および広告表示のために以下の外部サービスと技術を使用します。</p>
+
+        <h3>A. Google Analytics for Firebase</h3>
+        <p>アプリの利用イベント、画面遷移、利用習慣を記録・分析し、品質向上とユーザー体験の改善に役立てます。このプロセスにおいて端末識別子（広告ID、IPアドレス、デバイス情報）が処理される場合があります。</p>
+
+        <h3>B. Firebase Crashlytics</h3>
+        <p>アプリ内で不具合や技術的クラッシュが発生した際に、システムログ、エラー報告、OSバージョン、デバイスモデルなどを収集し、バグの修正に役立てます。</p>
+
+        <h3>C. Google AdMob & 同意管理（UMP）</h3>
+        <p>端末の広告識別子を使用し、最適な広告を表示します。EEA地域および英国のユーザーの同意設定はGoogle UMPを通じて取得・管理されます。設定はアプリの設定画面「プライバシー設定の管理」からいつでも変更可能です。</p>
+
+        <h3>D. Firebase Cloud Messaging（FCM）と通知</h3>
+        <p>通知を許可した場合、一意のFCMデバイストークンが生成されます。このトークンは通知を正しい端末に届けるためだけに処理されます。アプリ内の通知オプションがオフにされた場合、このトークンの削除/無効化処理が開始されます。アプリがアンインストールされた場合、トークンは時間の経過とともに自動的に無効（非アクティブ）になることがあります。</p>
+
+        <h3>E. ローカルストレージ (AsyncStorage)</h3>
+        <p>有効なサウンド、音量レベル、アプリの設定は、端末のローカルストレージ（AsyncStorage）に保存されます。ただし、ユーザー体験の向上と利用トレンドの分析を目的に、選択されたサウンドIDやカスタムミックスのアクティビティなどの分析イベントデータは、Firebase Analyticsサーバーへ安全に送信されます。特定の音量レベルなどのその他の個人設定は、端末内にのみローカルに保持されます。</p>
+
+        <h2>2. データの保持と削除</h2>
+        <p>ローカル設定は端末内に残り、アプリのアンインストール時に消去されます。アプリ内の通知オプションがオフにされた場合、FCMデバイストークンの削除/無効化が試みられます。アプリがアンインストールされた場合、トークンは時間の経過とともに無効になることがあります。分析およびクラッシュデータは、Googleのポリシーに従って保持されます。</p>
+
+        <h2>3. 子どものプライバシー</h2>
+        <p>当アプリは、13歳未満の子どもから故意にデータを収集することはありません。13歳未満の子どもが当社にデータを提供したことを知った場合は、お問い合わせください。</p>
+
+        <h2>4. ユーザーの権利</h2>
+        <p>GDPRおよびその他の適用法に基づき、ユーザーは自身のデータ処理に関する情報の要求、同意の撤回、およびUMP同意オプションを介した設定の管理を行う権利を有します。</p>
+
+        <h2>5. お問い合わせ</h2>
+        <p>当プライバシーポリシーに関するご質問は、以下までお問い合わせください: <strong>support@yousufe.net</strong></p>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+        <h1>利用規約</h1>
+        <h2>1. サービスの利用</h2>
+        <p>Calmixは、リラックスできる自然音および睡眠音を提供します。これらの音声コンテンツの無断複製または商用配布は禁止されています。</p>
+
+        <h2>2. ロックされたサウンドと広告</h2>
+        <p>一部のロックされた（プレミアム）サウンドは、リワード広告を視聴することで一時的（1時間）にロック解除できます。広告の配信はGoogle AdMobのポリシーに従います。</p>
+
+        <h2>3. 免責事項</h2>
+        <p>当アプリは「現状有姿」で提供され、開発者は一時的なサービスの中断や端末の不適合について一切の責任を負いません。</p>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 Calmix. All rights reserved.
+    </div>
+</div>
+
+<script>
+    function switchLang(lang) {
+        // Hide all containers
+        const containers = document.querySelectorAll('.policy-container');
+        containers.forEach(container => {
+            container.classList.remove('active');
+        });
+
+        // Show selected container
+        const target = document.getElementById('lang-' + lang);
+        if (target) {
+            target.classList.add('active');
+        }
+
+        // Update active class on buttons
+        const buttons = document.querySelectorAll('.lang-switch button');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        const activeBtn = document.getElementById('btn-' + lang);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        // Update hash
+        window.location.hash = lang;
+    }
+
+    // Initialize based on URL hash
+    window.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash.substring(1);
+        const validLangs = ['tr', 'en', 'de', 'es', 'fr', 'pt', 'ja'];
+        if (validLangs.includes(hash)) {
+            switchLang(hash);
+        } else {
+            // Default based on browser locale or default to tr
+            const userLang = navigator.language || navigator.userLanguage;
+            const prefix = userLang.substring(0, 2).toLowerCase();
+            if (validLangs.includes(prefix)) {
+                switchLang(prefix);
+            } else {
+                switchLang('tr');
+            }
+        }
+    });
+</script>
+</body>
+</html>

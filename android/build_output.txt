@@ -245,13 +245,13 @@ The application will run with the New Architecture enabled by default.
 > Task :app:checkDebugDuplicateClasses UP-TO-DATE
 
 > Task :react-native-track-player:compileDebugKotlin
-e: file:///Users/yusuf/Desktop/Script/yec.sleepsoundsmix/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt:548:51 Argument type mismatch: actual type is 'Bundle?', but 'Bundle' was expected.
-e: file:///Users/yusuf/Desktop/Script/yec.sleepsoundsmix/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt:588:17 Argument type mismatch: actual type is 'Bundle?', but 'Bundle' was expected.
+e: file:///Users/yusuf/Desktop/Apps/yec.sleepsoundsmix/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt:548:51 Argument type mismatch: actual type is 'Bundle?', but 'Bundle' was expected.
+e: file:///Users/yusuf/Desktop/Apps/yec.sleepsoundsmix/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt:588:17 Argument type mismatch: actual type is 'Bundle?', but 'Bundle' was expected.
 
 > Task :react-native-track-player:compileDebugKotlin FAILED
 > Task :app:mergeExtDexDebug
 
-[Incubating] Problems report is available at: file:///Users/yusuf/Desktop/Script/yec.sleepsoundsmix/android/build/reports/problems/problems-report.html
+[Incubating] Problems report is available at: file:///Users/yusuf/Desktop/Apps/yec.sleepsoundsmix/android/build/reports/problems/problems-report.html
 
 FAILURE: Build failed with an exception.
 

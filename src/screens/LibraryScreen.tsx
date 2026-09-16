@@ -1,24 +1,45 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, FlatList, StatusBar, View, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, FlatList, StatusBar, Alert, useWindowDimensions } from 'react-native';
+import AppScreen from '../layout/AppScreen';
 import SoundCard from '../components/SoundCard';
 import HeaderComponent from '../components/HeaderComponent';
 import ModeSwitcherComponent from '../components/ModeSwitcherComponent';
-import { MOCK_SOUNDS } from '../data/mockSounds';
 import useMixerStore from '../store/useMixerStore';
-import AppText from '../components/AppText';
-import { layout } from '../theme/layout';
+import EmptyState from '../components/EmptyState';
+import { screen, spacing } from '../theme/spacing';
 import { useNetInfo } from '@react-native-community/netinfo';
 import GlassToast from '../components/GlassToast';
+import BannerAdView from '../components/BannerAdView';
+import RewardedAdManager from '../services/RewardedAdManager';
+import { useTranslation } from 'react-i18next';
+import { getLocalizedSoundTitle } from '../utils/soundUtils';
 
 const LibraryScreen = () => {
+  const { t, i18n } = useTranslation();
+  const {fontScale, width} = useWindowDimensions();
+  const columns = fontScale > 1.3 || width < 360 ? 1 : 2;
   const [tick, setTick] = useState(0);
-  const activeSounds = useMixerStore((state: any) => state.activeSounds) || {};
-  const adAccess = useMixerStore((state: any) => state.adAccess) || {};
+  const activeSoundsRaw = useMixerStore((state: any) => state.activeSounds);
+  const adAccessRaw = useMixerStore((state: any) => state.adAccess);
+  const soundsRaw = useMixerStore((state: any) => state.sounds);
+  // Stabilize with useMemo to avoid changing object references on every render
+  const activeSounds = React.useMemo(
+    () => activeSoundsRaw || {},
+    [activeSoundsRaw],
+  );
+  const adAccess = React.useMemo(() => adAccessRaw || {}, [adAccessRaw]);
+  const sounds = React.useMemo(() => soundsRaw || [], [soundsRaw]);
+  const toggleSound = useMixerStore((state: any) => state.toggleSound);
+  const isSoundAccessible = useMixerStore(
+    (state: any) => state.isSoundAccessible,
+  );
+  const grantAdAccess = useMixerStore((state: any) => state.grantAdAccess);
 
   // Force re-render periodically to update lock states if access expires
   React.useEffect(() => {
-    const hasActiveAdAccess = Object.values(adAccess).some((a: any) => a.expiresAt > Date.now());
+    const hasActiveAdAccess = Object.values(adAccess).some(
+      (a: any) => a.expiresAt > Date.now(),
+    );
     if (!hasActiveAdAccess) return;
 
     const interval = setInterval(() => {
@@ -27,126 +48,168 @@ const LibraryScreen = () => {
     return () => clearInterval(interval);
   }, [adAccess]);
 
-  const toggleSound = useMixerStore(state => state.toggleSound);
-  const isSoundAccessible = useMixerStore(state => state.isSoundAccessible);
-  const grantAdAccess = useMixerStore(state => state.grantAdAccess);
-  const [activeMode, setActiveMode] = useState<'nature' | 'music' | 'ambience'>('nature');
+  const [activeMode, setActiveMode] = useState<'nature' | 'music' | 'ambience'>(
+    'nature',
+  );
   const [loadingAdSoundId, setLoadingAdSoundId] = useState<string | null>(null);
   const [showNetworkToast, setShowNetworkToast] = useState(false);
 
   const { isConnected } = useNetInfo();
 
-  const handleToggleSound = (item: any) => {
-    const isActive = activeSounds && activeSounds[item.id] !== undefined;
-    
-    if (isActive) {
-      toggleSound(item.id);
-      return;
-    }
+  const handleToggleSound = React.useCallback(
+    async (item: any) => {
+      const isActive = activeSounds && activeSounds[item.id] !== undefined;
 
-    const hasAccess = isSoundAccessible(item.id);
-
-    if (!hasAccess) {
-      // İnternet kontrolü: Reklam izlemek için internet gerekir
-      if (isConnected === false) {
-        setShowNetworkToast(true);
+      if (isActive) {
+        toggleSound(item.id);
         return;
       }
 
-      if (loadingAdSoundId) return;
+      const hasAccess = isSoundAccessible(item.id);
 
-      setLoadingAdSoundId(item.id);
-
-      // Rewarded Ad Mock Akışı
-      setTimeout(() => {
-        setLoadingAdSoundId(null);
-        // %85 başarı ihtimali ile mock ediyoruz
-        const success = Math.random() > 0.15;
-
-        if (success) {
-          // Yeni model: 1 reklam = tıklanan ses + sıradaki 1 kilitli ses (1 saatlik)
-          grantAdAccess(item.id);
-          // Açıldıktan sonra otomatik aktifleştir
-          toggleSound(item.id);
-        } else {
-          Alert.alert(
-            'Bağlantı Hatası',
-            'Reklam yüklenirken bir sorun oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.',
-            [{ text: 'Tamam', style: 'cancel' }]
-          );
+      if (!hasAccess) {
+        if (isConnected === false) {
+          setShowNetworkToast(true);
+          return;
         }
-      }, 1500);
 
-      return;
-    }
+        if (loadingAdSoundId) return;
 
-    toggleSound(item.id);
-  };
+        setLoadingAdSoundId(item.id);
+        try {
+          const isReady =
+            RewardedAdManager.isReady() ||
+            (await RewardedAdManager.waitUntilReady());
+          if (!isReady) {
+            if (RewardedAdManager.getLastError()) {
+              Alert.alert(t('common.error'), t('library.ad_error_msg'));
+              return;
+            }
 
-  const renderItem = ({ item }: { item: any }) => {
-    const isLocked = !isSoundAccessible(item.id);
-    const isActive = activeSounds && activeSounds[item.id] !== undefined;
+            Alert.alert(
+              t('library.ad_not_ready_title'),
+              t('library.ad_not_ready_msg'),
+              [{ text: t('common.ok') }],
+            );
+            return;
+          }
 
-    return (
-      <SoundCard
-        title={item.title}
-        iconName={item.icon}
-        isLocked={isLocked}
-        isActive={isActive}
-        isLoading={loadingAdSoundId === item.id}
-        disabled={loadingAdSoundId !== null && loadingAdSoundId !== item.id}
-        onPress={() => handleToggleSound(item)}
-      />
-    );
-  };
+          await RewardedAdManager.show(() => {
+            grantAdAccess(item.id);
+            toggleSound(item.id);
+          });
+        } catch (error) {
+          console.log('[AdMob] Show error:', error);
+          Alert.alert(t('common.error'), t('library.ad_error_msg'));
+        } finally {
+          setLoadingAdSoundId(null);
+        }
+        return;
+      }
 
-  const filteredSounds = MOCK_SOUNDS.filter(sound => sound.category === activeMode);
+      toggleSound(item.id);
+    },
+    [
+      activeSounds,
+      isSoundAccessible,
+      isConnected,
+      loadingAdSoundId,
+      grantAdAccess,
+      toggleSound,
+      t,
+    ],
+  );
 
-  const flatListExtraData = useMemo(() => ({
-    activeSounds,
-    isSoundAccessible,
-    loadingAdSoundId,
-    tick
-  }), [activeSounds, isSoundAccessible, loadingAdSoundId, tick]);
+  const renderItem = React.useCallback(
+    ({ item }: { item: any }) => {
+      const isLocked = !isSoundAccessible(item.id);
+      const isActive = activeSounds && activeSounds[item.id] !== undefined;
 
-  const dynamicPadding = Object.keys(activeSounds || {}).length > 0
-    ? layout.padding.screenBottomWithPlayer
-    : layout.padding.screenBottomDefault;
+      return (
+        <SoundCard
+          title={getLocalizedSoundTitle(item, i18n.language, t)}
+          iconName={item.icon}
+          isLocked={isLocked}
+          isActive={isActive}
+          isLoading={loadingAdSoundId === item.id}
+          disabled={loadingAdSoundId !== null && loadingAdSoundId !== item.id}
+          onPress={() => handleToggleSound(item)}
+        />
+      );
+    },
+    [
+      activeSounds,
+      isSoundAccessible,
+      loadingAdSoundId,
+      handleToggleSound,
+      t,
+      i18n.language,
+    ],
+  );
+
+  const filteredSounds = useMemo(
+    () => (sounds || []).filter((sound: any) => sound.category === activeMode),
+    [activeMode, sounds],
+  );
+
+  const flatListExtraData = useMemo(
+    () => ({
+      activeSounds,
+      isSoundAccessible,
+      loadingAdSoundId,
+      tick,
+    }),
+    [activeSounds, isSoundAccessible, loadingAdSoundId, tick],
+  );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
-      <HeaderComponent 
-        title="Doğanın Sesine Odaklan" 
-        subtitle="Kendi huzur dolu ortamınızı yaratmak için onlarca yüksek kaliteli ses arasından seçiminizi yapın." 
+    <AppScreen>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
       />
-      
-      <ModeSwitcherComponent 
-        activeMode={activeMode} 
-        onModeChange={(mode: any) => setActiveMode(mode)} 
-      />
-      
+
       <FlatList
-        data={filteredSounds}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        numColumns={2}
-        contentContainerStyle={[styles.listContent, { paddingBottom: dynamicPadding }, filteredSounds.length === 0 && styles.emptyListContent]}
-        extraData={flatListExtraData}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <AppText variant="body" color="secondary" style={styles.emptyText}>Bu kategoride henüz ses bulunmuyor.</AppText>
-          </View>
+        key={columns}
+        ListHeaderComponent={
+          <>
+            <HeaderComponent
+              inset={false}
+              title={t('library.header_title')}
+              subtitle={t('library.header_subtitle')}
+            />
+
+            <ModeSwitcherComponent
+              activeMode={activeMode}
+              onModeChange={(mode: any) => setActiveMode(mode)}
+            />
+          </>
         }
+        data={filteredSounds}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        numColumns={columns}
+        columnWrapperStyle={columns > 1 ? styles.columns : undefined}
+        contentContainerStyle={[
+          styles.listContent,
+          filteredSounds.length === 0 && styles.emptyListContent,
+        ]}
+        extraData={flatListExtraData}
+        initialNumToRender={8}
+        maxToRenderPerBatch={4}
+        windowSize={5}
+        removeClippedSubviews={true}
+        ListEmptyComponent={<EmptyState message={t('library.no_sounds')} />}
+        ListFooterComponent={<BannerAdView />}
       />
-      <GlassToast 
-        visible={showNetworkToast} 
-        message="İnternet bağlantınız yok. Yeni sesler eklemek için lütfen internetinizi kontrol edin." 
+      <GlassToast
+        visible={showNetworkToast}
+        message={t('common.network_error')}
         type="error"
-        onHide={() => setShowNetworkToast(false)} 
+        onHide={() => setShowNetworkToast(false)}
       />
-    </SafeAreaView>
+    </AppScreen>
   );
 };
 
@@ -156,22 +219,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   listContent: {
-    paddingHorizontal: layout.padding.screenHorizontal - 6, // Offset the SoundCard's margin (20-6=14)
-    paddingBottom: layout.padding.screenBottomDefault,
+    paddingHorizontal: screen.paddingHorizontal,
+    paddingBottom: screen.paddingBottom,
   },
+  columns: { gap: spacing.md },
   emptyListContent: {
-    flex: 1,
+    flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    marginTop: 40,
+    padding: spacing.xl,
+    marginTop: spacing.huge,
   },
   emptyText: {
     textAlign: 'center',
-  }
+  },
 });
 
 export default LibraryScreen;

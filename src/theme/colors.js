@@ -18,6 +18,11 @@ export const colors = {
     titleGradient: ['#91B2DF', '#4C1E9A'], // Blue-Purple title gradient
     star: '#FFC900', // Settings rating
   },
+  action: {
+    danger: ['rgba(239,50,75,0.4)', 'rgba(239,50,75,0.1)'],
+    success: ['rgba(71,241,133,0.4)', 'rgba(71,241,133,0.1)'],
+    warning: ['rgba(220,157,32,0.4)', 'rgba(220,157,32,0.1)'],
+  },
   glass: {
     cardNormal: ['rgba(141, 165, 208, 0.15)', 'rgba(72, 84, 106, 0.05)'], // Standardized from 0.2
     cardPremium: ['rgba(100, 152, 212, 0.2)', 'rgba(76, 30, 154, 0.2)'],
@@ -40,6 +45,6 @@ export const colors = {
   },
   navigation: {
     background: '#19202B',
-    inactiveIcon: 'rgba(255, 255, 255, 0.2)',
+    inactiveIcon: 'rgba(255, 255, 255, 0.6)',
   }
 };

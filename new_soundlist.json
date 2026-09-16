@@ -1,0 +1,699 @@
+[
+  {
+    "id": "yagmur-sesi-1",
+    "title": "Yağmur Sesi 1",
+    "icon": "cloud-showers-heavy",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fyagmur-sesi-1.m4a?alt=media",
+    "isLocked": false,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Yağmur Sesi 1",
+      "en": "Rain Sound 1",
+      "es": "Sonido de Lluvia 1",
+      "pt": "Som de Chuva 1",
+      "de": "Regengeräusch 1",
+      "fr": "Bruit de Pluie 1",
+      "ja": "雨の音 1"
+    }
+  },
+  {
+    "id": "firtina-sesi-1",
+    "title": "Gece Fırtınası",
+    "icon": "wind",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Ffirtina-sesi-1.m4a?alt=media",
+    "isLocked": false,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Gece Fırtınası",
+      "en": "Night Storm",
+      "es": "Tormenta Nocturna",
+      "pt": "Tempestade Noturna",
+      "de": "Nachtsturm",
+      "fr": "Tempête Nocturne",
+      "ja": "夜の嵐"
+    }
+  },
+  {
+    "id": "ates-sesi-1",
+    "title": "Kamp Ateşi",
+    "icon": "fire",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fates-sesi-1.m4a?alt=media",
+    "isLocked": false,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Kamp Ateşi",
+      "en": "Campfire",
+      "es": "Fogata",
+      "pt": "Fogueira",
+      "de": "Lagerfeuer",
+      "fr": "Feu de Camp",
+      "ja": "キャンプファイヤー"
+    }
+  },
+  {
+    "id": "fan-sesi",
+    "title": "Beyaz Gürültü (Fan)",
+    "icon": "vial-circle-check",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Ffan-sesi.m4a?alt=media",
+    "isLocked": false,
+    "category": "ambience",
+    "titleTranslations": {
+      "tr": "Beyaz Gürültü (Fan)",
+      "en": "White Noise (Fan)",
+      "es": "Ruido Blanco (Ventilador)",
+      "pt": "Ruído Branco (Ventilador)",
+      "de": "Weißes Rauschen (Lüfter)",
+      "fr": "Bruit Blanc (Ventilateur)",
+      "ja": "ホワイトノイズ（ファン）"
+    }
+  },
+  {
+    "id": "hafif-piyano-muzik",
+    "title": "Hafif Piyano",
+    "icon": "music",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fhafif-piyano-muzik.m4a?alt=media",
+    "isLocked": false,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Hafif Piyano",
+      "en": "Soft Piano",
+      "es": "Piano Suave",
+      "pt": "Piano Suave",
+      "de": "Sanftes Klavier",
+      "fr": "Piano Doux",
+      "ja": "ソフトピアノ"
+    }
+  },
+  {
+    "id": "kus-sesi-1",
+    "title": "Kuş Sesi 1",
+    "icon": "dove",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fkus-sesi-1.m4a?alt=media",
+    "isLocked": false,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Kuş Sesi 1",
+      "en": "Bird Sound 1",
+      "es": "Sonido de Pájaro 1",
+      "pt": "Som de Pássaro 1",
+      "de": "Vogelgeräusch 1",
+      "fr": "Bruit d'Oiseau 1",
+      "ja": "鳥の鳴き声 1"
+    }
+  },
+  {
+    "id": "hafif-muzik",
+    "title": "Sakin Müzik",
+    "icon": "leaf",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fhafif-muzik.m4a?alt=media",
+    "isLocked": false,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Sakin Müzik",
+      "en": "Calm Music",
+      "es": "Música Tranquila",
+      "pt": "Música Calma",
+      "de": "Ruhige Musik",
+      "fr": "Musique Calme",
+      "ja": "穏やかな音楽"
+    }
+  },
+  {
+    "id": "guguk-kusu",
+    "title": "Guguk Kuşu",
+    "icon": "crow",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fguguk-kusu.m4a?alt=media",
+    "isLocked": false,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Guguk Kuşu",
+      "en": "Cuckoo Bird",
+      "es": "Cuco",
+      "pt": "Cuco",
+      "de": "Kuckuck",
+      "fr": "Coucou",
+      "ja": "カッコウ"
+    }
+  },
+  {
+    "id": "tren-sesi",
+    "title": "Tren Yolculuğu",
+    "icon": "train",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Ftren-sesi.m4a?alt=media",
+    "isLocked": false,
+    "category": "ambience",
+    "titleTranslations": {
+      "tr": "Tren Yolculuğu",
+      "en": "Train Ride",
+      "es": "Viaje en Tren",
+      "pt": "Passeio de Trem",
+      "de": "Zugfahrt",
+      "fr": "Voyage en Train",
+      "ja": "電車の旅"
+    }
+  },
+  {
+    "id": "orman-sesi",
+    "title": "Derin Orman",
+    "icon": "tree",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Forman-sesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Derin Orman",
+      "en": "Deep Forest",
+      "es": "Bosque Profundo",
+      "pt": "Floresta Profunda",
+      "de": "Tiefer Wald",
+      "fr": "Forêt Profonde",
+      "ja": "深い森"
+    }
+  },
+  {
+    "id": "simsek-sesi-1",
+    "title": "Şimşek Çakması",
+    "icon": "bolt",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fsimsek-sesi-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Şimşek Çakması",
+      "en": "Lightning Strike",
+      "es": "Rayo",
+      "pt": "Raio",
+      "de": "Blitzschlag",
+      "fr": "Coup de Foudre",
+      "ja": "落雷"
+    }
+  },
+  {
+    "id": "prensesler-icin-muzik",
+    "title": "Prenses Uykusu",
+    "icon": "star",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fprensesler-icin-muzik.m4a?alt=media",
+    "isLocked": true,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Prenses Uykusu",
+      "en": "Princess Sleep",
+      "es": "Sueño de Princesa",
+      "pt": "Sono de Princesa",
+      "de": "Prinzessinnenschlaf",
+      "fr": "Sommeil de Princesse",
+      "ja": "プリンセスの睡眠"
+    }
+  },
+  {
+    "id": "sakinlestirici-muzik-1",
+    "title": "Tibet Çanı",
+    "icon": "bell",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fsakinlestirici-muzik-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Tibet Çanı",
+      "en": "Tibetan Bowl",
+      "es": "Cuenco Tibetano",
+      "pt": "Tigela Tibetana",
+      "de": "Klangschale",
+      "fr": "Bol Tibétain",
+      "ja": "チベットボウル"
+    }
+  },
+  {
+    "id": "hayal-modu-muzik",
+    "title": "Hayal Modu",
+    "icon": "moon",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fhayal-modu-muzik.m4a?alt=media",
+    "isLocked": true,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Hayal Modu",
+      "en": "Dream Mode",
+      "es": "Modo de Sueño",
+      "pt": "Modo de Sonho",
+      "de": "Traummodus",
+      "fr": "Mode Rêve",
+      "ja": "ドリームモード"
+    }
+  },
+  {
+    "id": "ambiyans-music",
+    "title": "Uzay Ambiyansı",
+    "icon": "rocket",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fambiyans-music.m4a?alt=media",
+    "isLocked": true,
+    "category": "ambience",
+    "titleTranslations": {
+      "tr": "Uzay Ambiyansı",
+      "en": "Space Ambience",
+      "es": "Ambiente Espacial",
+      "pt": "Ambiente Espacial",
+      "de": "Weltraum-Ambiente",
+      "fr": "Ambiance Spatiale",
+      "ja": "宇宙の雰囲気"
+    }
+  },
+  {
+    "id": "bulbul-sesi-1",
+    "title": "Bülbül Sesi",
+    "icon": "dove",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fbulbul-sesi-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Bülbül Sesi",
+      "en": "Nightingale Sound",
+      "es": "Sonido de Ruiseñor",
+      "pt": "Som de Rouxinol",
+      "de": "Nachtigall-Geräusch",
+      "fr": "Chant du Rossignol",
+      "ja": "ナイチンゲールの音"
+    }
+  },
+  {
+    "id": "cekirge-sesi-1",
+    "title": "Gece Çekirgesi",
+    "icon": "bug",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fcekirge-sesi-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Gece Çekirgesi",
+      "en": "Night Cricket",
+      "es": "Grillo Nocturno",
+      "pt": "Grilo Noturno",
+      "de": "Nachtgrille",
+      "fr": "Grillon Nocturne",
+      "ja": "夜のコオロギ"
+    }
+  },
+  {
+    "id": "gok-gurultusu-ses-1",
+    "title": "Gök Gürültüsü 1",
+    "icon": "cloud-bolt",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fgok-gurultusu-ses-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Gök Gürültüsü 1",
+      "en": "Thunder 1",
+      "es": "Trueno 1",
+      "pt": "Trovão 1",
+      "de": "Donner 1",
+      "fr": "Tonnerre 1",
+      "ja": "雷 1"
+    }
+  },
+  {
+    "id": "gok-gurultusu-sesi-2",
+    "title": "Gök Gürültüsü 2",
+    "icon": "bolt-lightning",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fgok-gurultusu-sesi-2.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Gök Gürültüsü 2",
+      "en": "Thunder 2",
+      "es": "Trueno 2",
+      "pt": "Trovão 2",
+      "de": "Donner 2",
+      "fr": "Tonnerre 2",
+      "ja": "雷 2"
+    }
+  },
+  {
+    "id": "yagmur-sesi-2",
+    "title": "Yağmur Sesi 2",
+    "icon": "cloud-rain",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fyagmur-sesi-2.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Yağmur Sesi 2",
+      "en": "Rain Sound 2",
+      "es": "Sonido de Lluvia 2",
+      "pt": "Som de Chuva 2",
+      "de": "Regengeräusch 2",
+      "fr": "Bruit de Pluie 2",
+      "ja": "雨の音 2"
+    }
+  },
+  {
+    "id": "sahil-sesi-1",
+    "title": "Sahil Sesi 1",
+    "icon": "umbrella-beach",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fsahil-sesi-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Sahil Sesi 1",
+      "en": "Beach Sound 1",
+      "es": "Sonido de Playa 1",
+      "pt": "Som de Praia 1",
+      "de": "Strandgeräusch 1",
+      "fr": "Bruit de Plage 1",
+      "ja": "ビーチの音 1"
+    }
+  },
+  {
+    "id": "piyano-muzik",
+    "title": "Melankolik Piyano",
+    "icon": "music",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fpiyano-muzik.m4a?alt=media",
+    "isLocked": true,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Melankolik Piyano",
+      "en": "Melancholic Piano",
+      "es": "Piano Melancólico",
+      "pt": "Piano Melancólico",
+      "de": "Melancholisches Klavier",
+      "fr": "Piano Mélancolique",
+      "ja": "メランコリックなピアノ"
+    }
+  },
+  {
+    "id": "sinek-sesi-1",
+    "title": "Sinek Vızıltısı",
+    "icon": "mosquito",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fsinek-sesi-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Sinek Vızıltısı",
+      "en": "Mosquito Buzz",
+      "es": "Zumbido de Mosquito",
+      "pt": "Zumbido de Mosquito",
+      "de": "Mückensummen",
+      "fr": "Bourdonnement de Moustique",
+      "ja": "蚊の羽音"
+    }
+  },
+  {
+    "id": "cafe-ambiyansi",
+    "title": "Kahve Dükkanı",
+    "icon": "mug-hot",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fcafe-ambiyansi.m4a?alt=media",
+    "isLocked": true,
+    "category": "ambience",
+    "titleTranslations": {
+      "tr": "Kahve Dükkanı",
+      "en": "Coffee Shop",
+      "es": "Cafetería",
+      "pt": "Cafeteria",
+      "de": "Café",
+      "fr": "Café",
+      "ja": "コーヒーショップ"
+    }
+  },
+  {
+    "id": "deniz-alti-sesi",
+    "title": "Deniz Altı",
+    "icon": "fish",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fdeniz-alti-sesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Deniz Altı",
+      "en": "Underwater",
+      "es": "Bajo el Agua",
+      "pt": "Debaixo d'água",
+      "de": "Unterwasser",
+      "fr": "Sous-marin",
+      "ja": "水中"
+    }
+  },
+  {
+    "id": "dere-kenari",
+    "title": "Dere Kenarı",
+    "icon": "water",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fdere-kenari.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Dere Kenarı",
+      "en": "Riverside",
+      "es": "Orilla del Río",
+      "pt": "Beira do Rio",
+      "de": "Flussufer",
+      "fr": "Bord de Rivière",
+      "ja": "川辺"
+    }
+  },
+  {
+    "id": "derin-dusunce-ses",
+    "title": "Derin Düşünce",
+    "icon": "brain",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fderin-dusunce-ses.m4a?alt=media",
+    "isLocked": true,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Derin Düşünce",
+      "en": "Deep Thought",
+      "es": "Pensamiento Profundo",
+      "pt": "Pensamento Profundo",
+      "de": "Tiefe Gedanken",
+      "fr": "Pensée Profonde",
+      "ja": "深い思考"
+    }
+  },
+  {
+    "id": "karda-yuruyus",
+    "title": "Karda Yürüyüş",
+    "icon": "snowflake",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fkarda-yuruyus.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Karda Yürüyüş",
+      "en": "Walking in Snow",
+      "es": "Caminando en la Nieve",
+      "pt": "Caminhando na Neve",
+      "de": "Im Schnee gehen",
+      "fr": "Marcher dans la Neige",
+      "ja": "雪の中を歩く"
+    }
+  },
+  {
+    "id": "kedi-mirlamasi",
+    "title": "Kedi Mırlaması",
+    "icon": "cat",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fkedi-mirlamasi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Kedi Mırlaması",
+      "en": "Cat Purring",
+      "es": "Ronroneo de Gato",
+      "pt": "Ronronar de Gato",
+      "de": "Katzenschnurren",
+      "fr": "Ronronnement de Chat",
+      "ja": "猫のゴロゴロ音"
+    }
+  },
+  {
+    "id": "lo-fi-sabah-muzik",
+    "title": "Lo-Fi Sabah",
+    "icon": "sun",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Flo-fi-sabah-muzik.m4a?alt=media",
+    "isLocked": true,
+    "category": "music",
+    "titleTranslations": {
+      "tr": "Lo-Fi Sabah",
+      "en": "Lo-Fi Morning",
+      "es": "Mañana Lo-Fi",
+      "pt": "Manhã Lo-Fi",
+      "de": "Lo-Fi-Morgen",
+      "fr": "Matin Lo-Fi",
+      "ja": "Lo-Fiの朝"
+    }
+  },
+  {
+    "id": "no-sinyal",
+    "title": "Radyo Paraziti",
+    "icon": "radio",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fno-sinyal.m4a?alt=media",
+    "isLocked": true,
+    "category": "ambience",
+    "titleTranslations": {
+      "tr": "Radyo Paraziti",
+      "en": "Radio Static",
+      "es": "Estática de Radio",
+      "pt": "Estática de Rádio",
+      "de": "Radiostörungen",
+      "fr": "Statique Radio",
+      "ja": "ラジオのノイズ"
+    }
+  },
+  {
+    "id": "rabarba-sesi",
+    "title": "Rabarba",
+    "icon": "people-group",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Frabarba-sesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "ambience",
+    "titleTranslations": {
+      "tr": "Rabarba",
+      "en": "Crowd Chatter",
+      "es": "Murmullo de Multitud",
+      "pt": "Vozes da Multidão",
+      "de": "Menschenmenge",
+      "fr": "Bavardage de Foule",
+      "ja": "群衆のざわめき"
+    }
+  },
+  {
+    "id": "tarla-sesi",
+    "title": "Tarla Sesi",
+    "icon": "leaf",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Ftarla-sesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Tarla Sesi",
+      "en": "Field Sound",
+      "es": "Sonido de Campo",
+      "pt": "Som de Campo",
+      "de": "Feldgeräusch",
+      "fr": "Bruit de Champ",
+      "ja": "野原の音"
+    }
+  },
+  {
+    "id": "baykus-sesi",
+    "title": "Baykuş Sesi",
+    "icon": "feather",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fbaykus-sesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Baykuş Sesi",
+      "en": "Owl Sound",
+      "es": "Sonido de Búho",
+      "pt": "Som de Coruja",
+      "de": "Eulengeräusch",
+      "fr": "Bruit de Hibou",
+      "ja": "フクロウの鳴き声"
+    }
+  },
+  {
+    "id": "karga-sesi",
+    "title": "Karga Sesi",
+    "icon": "crow",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fkarga-sesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Karga Sesi",
+      "en": "Crow Sound",
+      "es": "Sonido de Cuervo",
+      "pt": "Som de Corvo",
+      "de": "Krähengeräusch",
+      "fr": "Bruit de Corbeau",
+      "ja": "カラスの鳴き声"
+    }
+  },
+  {
+    "id": "okyanus-sesi",
+    "title": "Derin Okyanus",
+    "icon": "water",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fokyanus-sesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Derin Okyanus",
+      "en": "Deep Ocean",
+      "es": "Océano Profundo",
+      "pt": "Oceano Profundo",
+      "de": "Tiefer Ozean",
+      "fr": "Océan Profond",
+      "ja": "深い海"
+    }
+  },
+  {
+    "id": "orman-kuslari",
+    "title": "Orman Kuşları",
+    "icon": "dove",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Forman-kuslari.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Orman Kuşları",
+      "en": "Forest Birds",
+      "es": "Pájaros del Bosque",
+      "pt": "Pássaros da Floresta",
+      "de": "Waldvögel",
+      "fr": "Oiseaux de la Forêt",
+      "ja": "森の鳥"
+    }
+  },
+  {
+    "id": "sahil-sesi-2",
+    "title": "Sahil Sesi 2",
+    "icon": "umbrella-beach",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fsahil-sesi-2.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Sahil Sesi 2",
+      "en": "Beach Sound 2",
+      "es": "Sonido de Playa 2",
+      "pt": "Som de Praia 2",
+      "de": "Strandgeräusch 2",
+      "fr": "Bruit de Plage 2",
+      "ja": "ビーチの音 2"
+    }
+  },
+  {
+    "id": "somine-atesi",
+    "title": "Şömine Ateşi",
+    "icon": "fire-burner",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fsomine-atesi.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Şömine Ateşi",
+      "en": "Fireplace",
+      "es": "Chimenea",
+      "pt": "Lareira",
+      "de": "Kamin",
+      "fr": "Cheminée",
+      "ja": "暖炉"
+    }
+  },
+  {
+    "id": "kamp-ates-sesi-1",
+    "title": "Kamp Ateşi 2",
+    "icon": "fire",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fkamp-ates-sesi-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Kamp Ateşi 2",
+      "en": "Campfire 2",
+      "es": "Fogata 2",
+      "pt": "Fogueira 2",
+      "de": "Lagerfeuer 2",
+      "fr": "Feu de Camp 2",
+      "ja": "キャンプファイヤー 2"
+    }
+  },
+  {
+    "id": "deniz-sesi-1",
+    "title": "Deniz Sesi 1",
+    "icon": "water",
+    "url": "https://firebasestorage.googleapis.com/v0/b/comyecsleepsoundsmix.firebasestorage.app/o/Sounds%2Fdeniz-sesi-1.m4a?alt=media",
+    "isLocked": true,
+    "category": "nature",
+    "titleTranslations": {
+      "tr": "Deniz Sesi 1",
+      "en": "Sea Sound 1",
+      "es": "Sonido de Mar 1",
+      "pt": "Som de Mar 1",
+      "de": "Meeresgeräusch 1",
+      "fr": "Bruit de Mer 1",
+      "ja": "海の音 1"
+    }
+  }
+]

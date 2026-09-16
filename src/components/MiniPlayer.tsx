@@ -1,22 +1,28 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import GlassBlur from './GlassBlur';
 import AppText from './AppText';
+import IconButton from './IconButton';
 import useMixerStore from '../store/useMixerStore';
 import { colors } from '../theme/colors';
 import { layout } from '../theme/layout';
+import { component, screen } from '../theme/tokens';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
-const MiniPlayer = () => {
-  const navigation = useNavigation();
-  const activeSounds = useMixerStore((state: any) => state.activeSounds) || {};
+const MiniPlayer = ({ onOpenMixer }: { onOpenMixer: () => void }) => {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+
+  // Use targeted selectors to avoid re-rendering on volume changes
+  const activeCount = useMixerStore(
+    (state: any) => Object.keys(state.activeSounds || {}).length,
+  );
   const isPausedBySystem = useMixerStore(
     (state: any) => state.isPausedBySystem,
   );
   const setSystemPaused = useMixerStore((state: any) => state.setSystemPaused);
-
-  const activeCount = Object.keys(activeSounds).length;
 
   if (activeCount === 0) return null;
 
@@ -25,14 +31,28 @@ const MiniPlayer = () => {
   };
 
   const goToMixer = () => {
-    navigation.navigate('Mixer' as never);
+    onOpenMixer();
   };
 
   return (
-    <View style={styles.container}>
-      <Pressable onPress={goToMixer}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingLeft: insets.left + screen.paddingHorizontal,
+          paddingRight: insets.right + screen.paddingHorizontal,
+        },
+      ]}
+    >
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('navigation.mixer')}
+        onPress={goToMixer}
+      >
         {({ pressed: isCardPressed }) => (
-          <View style={[styles.cardContainer, isCardPressed && styles.cardPressed]}>
+          <View
+            style={[styles.cardContainer, isCardPressed && styles.cardPressed]}
+          >
             <GlassBlur />
             <View style={[styles.content, styles.cardContent]}>
               <View style={styles.leftSection}>
@@ -42,33 +62,24 @@ const MiniPlayer = () => {
                   color={colors.text.primary}
                   style={styles.icon}
                 />
-                <AppText variant="body" weight="medium">
-                  {activeCount} ses aktif
+                <AppText variant="body" weight="medium" style={styles.label}>
+                  {t('mixer.active_count', { count: activeCount })}
                 </AppText>
               </View>
 
               <View style={styles.rightSection}>
-                <Pressable
-                  accessibilityRole="button"
+                <IconButton
+                  name={isPausedBySystem ? 'play' : 'pause'}
+                  variant="glass"
+                  size="small"
                   accessibilityLabel={
-                    isPausedBySystem ? 'Sesleri oynat' : 'Sesleri duraklat'
+                    isPausedBySystem ? t('mixer.play') : t('mixer.pause')
                   }
-                  hitSlop={8}
-                  style={({ pressed }) => [
-                    styles.playPauseButton,
-                    pressed && styles.playPauseButtonPressed,
-                  ]}
                   onPress={event => {
                     event.stopPropagation();
                     togglePlayPause();
                   }}
-                >
-                  <Icon
-                    name={isPausedBySystem ? 'play' : 'pause'}
-                    size={16}
-                    color={colors.text.primary}
-                  />
-                </Pressable>
+                />
               </View>
             </View>
           </View>
@@ -80,11 +91,10 @@ const MiniPlayer = () => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    bottom: 92,
-    left: layout.spacing.lg,
-    right: layout.spacing.lg,
-    zIndex: 100,
+    width: '100%',
+    maxWidth: screen.maxWidth,
+    alignSelf: 'center',
+    paddingVertical: layout.spacing.sm,
   },
   cardContainer: {
     borderRadius: layout.radius.xl,
@@ -105,7 +115,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  label: { flexShrink: 1 },
   leftSection: {
+    flex: 1,
+    marginRight: layout.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -117,8 +130,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   playPauseButton: {
-    width: 40,
-    height: 40,
+    width: component.touchTarget,
+    height: component.touchTarget,
     borderRadius: layout.radius.xl,
     backgroundColor: colors.glass.buttonSecondary,
     justifyContent: 'center',

@@ -19,6 +19,7 @@ public class NativeSoundManagerPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new NativeSoundManagerModule(reactContext));
+        modules.add(new NativeFullscreenModule(reactContext));
         return modules;
     }
 }

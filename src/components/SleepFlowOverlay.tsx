@@ -1,20 +1,28 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { spacing, fontSize, fontFamily, colors } from '../theme/tokens';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Dimensions,
   Animated,
-  TouchableOpacity,
   Pressable,
-  StatusBar
+  StatusBar,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome6';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import IconButton from './IconButton';
+import useReducedMotion from '../hooks/useReducedMotion';
 import useMixerStore from '../store/useMixerStore';
 
-import { PEACEFUL_WORDS } from '../data/sleepFlowWords';
+import { useTranslation } from 'react-i18next';
 
-const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => void }) => {
+const DriftingWord = ({
+  word,
+  onFinished,
+}: {
+  word: string;
+  onFinished: () => void;
+}) => {
   const fadeAnim = useRef(new Animated.Value(0.1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
   const onFinishedRef = useRef(onFinished);
@@ -35,7 +43,7 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
     return {
       fontWeight: weights[randomIndex] as any,
       fontFamily: families[randomIndex],
-      fontStyle: isItalic ? 'italic' as const : 'normal' as const,
+      fontStyle: isItalic ? ('italic' as const) : ('normal' as const),
       fontSize: 8 + Math.random() * 16, // Random size between 8 and 24
     };
   });
@@ -59,7 +67,7 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
         toValue: 0,
         duration: 1000,
         useNativeDriver: true,
-      })
+      }),
     ]);
 
     // Drift slowly downwards during the whole 3s
@@ -80,15 +88,12 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
 
   return (
     <View
-      style={[
-        styles.wordContainer,
-        { left: position.left, top: position.top }
-      ]}
+      style={[styles.wordContainer, { left: position.left, top: position.top }]}
     >
       <Animated.View
         style={{
           opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }]
+          transform: [{ translateY: slideAnim }],
         }}
       >
         <Text style={[styles.word, fontStyle]}>{word}</Text>
@@ -98,53 +103,72 @@ const DriftingWord = ({ word, onFinished }: { word: string, onFinished: () => vo
 };
 
 const SleepFlowOverlay = () => {
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.resolvedLanguage || i18n.language || 'en';
+  const currentWords = useMemo(() => {
+    const words = i18n.getResource(
+      currentLanguage,
+      'translation',
+      'sleep_flow.words',
+    );
+    return Array.isArray(words) ? words : [];
+  }, [i18n, currentLanguage]);
+
+  const insets = useSafeAreaInsets();
   const setSleepFlowActive = useMixerStore(state => state.setSleepFlowActive);
   const targetTimestamp = useMixerStore(state => state.targetTimestamp);
   const timer = useMixerStore(state => state.timer);
-  const stopTimer = useMixerStore(state => state.stopTimer);
+  const isTimerRunning = useMixerStore(state => state.isTimerRunning);
+  const reducedMotion = useReducedMotion();
 
-  const [words, setWords] = useState<{ id: number, text: string }[]>([]);
+  const hasTimer = Boolean(isTimerRunning && targetTimestamp && timer > 0);
+
+  const [words, setWords] = useState<{ id: number; text: string }[]>([]);
   const [showControls, setShowControls] = useState(false);
   const [remainingTime, setRemainingTime] = useState('');
   const [remainingRatio, setRemainingRatio] = useState(1);
-  const totalMsRef = useRef<number>(0);
   const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wordIdCounter = useRef(0);
 
   useEffect(() => {
+    if (reducedMotion) {
+      setWords([]);
+      return;
+    }
     // Add a new word every few seconds
     const interval = setInterval(() => {
       wordIdCounter.current += 1;
-      const newWord = PEACEFUL_WORDS[Math.floor(Math.random() * PEACEFUL_WORDS.length)];
+      const newWord =
+        currentWords[Math.floor(Math.random() * currentWords.length)];
       if (newWord) {
         setWords(prev => [
           ...prev,
-          { id: wordIdCounter.current, text: newWord }
+          { id: wordIdCounter.current, text: newWord },
         ]);
       }
     }, 2000); // More frequent words to allow overlapping and a continuous flow
 
     return () => clearInterval(interval);
-  }, []);
-
-  // Set total duration once on mount from the store's timer value (minutes)
-  useEffect(() => {
-    if (timer > 0) totalMsRef.current = timer * 60 * 1000;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentWords, reducedMotion]);
 
   useEffect(() => {
     const updateTime = () => {
-      if (!targetTimestamp) return;
+      if (!hasTimer || !targetTimestamp) {
+        setRemainingTime('');
+        setRemainingRatio(0);
+        return;
+      }
       const diff = targetTimestamp - Date.now();
-      if (diff <= 500) {
-        stopTimer();
-        setSleepFlowActive(false);
+      const total = (timer || 1) * 60000;
+      if (diff <= 0) {
+        setRemainingTime('00:00');
+        setRemainingRatio(0);
       } else {
         const m = Math.floor(diff / 60000);
         const s = Math.floor((diff % 60000) / 1000);
-        setRemainingTime(`${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
-        const total = totalMsRef.current > 0 ? totalMsRef.current : diff;
+        setRemainingTime(
+          `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`,
+        );
         setRemainingRatio(Math.min(1, Math.max(0, diff / total)));
       }
     };
@@ -152,7 +176,7 @@ const SleepFlowOverlay = () => {
     updateTime();
     const timeInterval = setInterval(updateTime, 1000);
     return () => clearInterval(timeInterval);
-  }, [setSleepFlowActive, stopTimer, targetTimestamp]);
+  }, [hasTimer, targetTimestamp, timer]);
 
   const handleScreenPress = () => {
     if (showControls) {
@@ -175,10 +199,8 @@ const SleepFlowOverlay = () => {
     };
   }, []);
 
-  const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
-
   return (
-    <View style={[styles.container, { width: screenWidth, height: screenHeight }]}>
+    <View style={styles.container}>
       <StatusBar hidden />
 
       {/* 1. Words Layer */}
@@ -193,27 +215,47 @@ const SleepFlowOverlay = () => {
       </View>
 
       {/* 2. Interaction Layer */}
-      <Pressable
-        style={styles.pressableLayer}
-        onPress={handleScreenPress}
-      >
-        {showControls && (
-          <View style={styles.bottomPanel}>
-            {/* Progress bar — full width, minimal */}
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${remainingRatio * 100}%` }]} />
-            </View>
+      <Pressable style={styles.pressableLayer} onPress={handleScreenPress}>
+        {(showControls || reducedMotion) && (
+          <View
+            style={[
+              styles.bottomPanel,
+              { paddingBottom: Math.max(insets.bottom, 20) + 20 },
+            ]}
+          >
+            {/* Subtle background for visibility */}
+            <View style={styles.panelBg} />
+
+            {/* Progress bar — only shown when timer is active */}
+            {hasTimer && (
+              <View style={styles.progressTrack}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    { width: `${remainingRatio * 100}%` },
+                  ]}
+                />
+              </View>
+            )}
 
             {/* Row: time left + close */}
-            <View style={styles.controlsRow}>
-              <Text style={styles.timerText}>{remainingTime}</Text>
-              <TouchableOpacity
-                onPress={() => setSleepFlowActive(false)}
-                style={styles.closeButton}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              >
-                <Icon name="xmark" size={18} color="rgba(255,255,255,0.5)" />
-              </TouchableOpacity>
+            <View
+              style={[
+                styles.controlsRow,
+                !hasTimer && styles.controlsRowNoTimer,
+              ]}
+            >
+              {hasTimer ? (
+                <Text style={styles.timerText}>{remainingTime}</Text>
+              ) : null}
+              <IconButton
+                name="xmark"
+                accessibilityLabel={t('common.close')}
+                onPress={event => {
+                  event.stopPropagation();
+                  setSleepFlowActive(false);
+                }}
+              />
             </View>
           </View>
         )}
@@ -224,8 +266,8 @@ const SleepFlowOverlay = () => {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: '#000000ff',
+    flex: 1,
+    backgroundColor: '#000000',
     zIndex: 9999,
   },
   wordsLayer: {
@@ -240,9 +282,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   word: {
-    color: '#FFFFFF',
+    color: colors.text.primary,
     fontSize: 24,
-    fontFamily: 'Inter-Light',
+    fontFamily: fontFamily.light,
     letterSpacing: 2,
   },
   bottomPanel: {
@@ -250,33 +292,45 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingBottom: 48,
-    zIndex: 2,
+    zIndex: 5,
+  },
+  panelBg: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   progressTrack: {
     width: '100%',
-    height: 2,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    height: 3, // Slightly thicker
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: '#47F185', // Match brand success color for better visibility
   },
   controlsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 14,
+    paddingHorizontal: spacing.xxl,
+    paddingTop: spacing.lg,
+  },
+  controlsRowNoTimer: {
+    justifyContent: 'flex-end',
   },
   closeButton: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
   },
   timerText: {
-    color: 'rgba(255,255,255,0.45)',
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
+    color: colors.text.primary, // Full white for max contrast
+    fontSize: fontSize.body,
+    fontFamily: fontFamily.bold,
     letterSpacing: 1,
   },
 });
