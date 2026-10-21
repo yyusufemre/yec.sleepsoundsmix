@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconButton from './IconButton';
 import useReducedMotion from '../hooks/useReducedMotion';
 import useMixerStore from '../store/useMixerStore';
+import { trackEvent } from '../services/AnalyticsService';
 
 import { useTranslation } from 'react-i18next';
 
@@ -129,6 +130,23 @@ const SleepFlowOverlay = () => {
   const [remainingRatio, setRemainingRatio] = useState(1);
   const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wordIdCounter = useRef(0);
+  const openTimeRef = useRef(Date.now());
+
+  useEffect(() => {
+    trackEvent('sleep_flow_opened', {
+      is_timed: hasTimer ? 1 : 0,
+      duration_minutes: timer || 0,
+    });
+
+    return () => {
+      const elapsedSeconds = Math.round(
+        (Date.now() - openTimeRef.current) / 1000,
+      );
+      trackEvent('sleep_flow_closed', {
+        elapsed_seconds: elapsedSeconds,
+      });
+    };
+  }, []);
 
   useEffect(() => {
     if (reducedMotion) {

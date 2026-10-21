@@ -11,6 +11,7 @@ import AppTabBar from '../layout/AppTabBar';
 import { colors, component, spacing, fontFamily } from '../theme/tokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassBlur from '../components/GlassBlur';
+import { trackEvent } from '../services/AnalyticsService';
 
 const Tab = createBottomTabNavigator();
 
@@ -179,9 +180,28 @@ const AppNavigator = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { fontScale } = useWindowDimensions();
+  const navigationRef = useRef<any>(null);
+  const routeNameRef = useRef<string | undefined>(undefined);
 
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer
+      ref={navigationRef}
+      theme={navTheme}
+      onReady={() => {
+        const initialRoute = navigationRef.current?.getCurrentRoute()?.name;
+        routeNameRef.current = initialRoute;
+        if (initialRoute) {
+          trackEvent('screen_view', { screen_name: initialRoute });
+        }
+      }}
+      onStateChange={() => {
+        const currentRoute = navigationRef.current?.getCurrentRoute()?.name;
+        if (currentRoute && routeNameRef.current !== currentRoute) {
+          routeNameRef.current = currentRoute;
+          trackEvent('screen_view', { screen_name: currentRoute });
+        }
+      }}
+    >
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <Tab.Navigator
           tabBar={renderAppTabBar}

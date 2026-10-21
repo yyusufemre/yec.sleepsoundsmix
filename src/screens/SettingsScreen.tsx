@@ -31,6 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../locales/languages';
 import NotificationService from '../services/NotificationService';
 import ConsentService from '../services/ConsentService';
+import { trackEvent } from '../services/AnalyticsService';
 
 const pkg = require('../../package.json');
 
@@ -59,6 +60,10 @@ const SettingsScreen = () => {
   };
 
   const handleRate = () => {
+    trackEvent('rate_us_clicked', {
+      already_rated: hasRated ? 1 : 0,
+    });
+
     const storeUrl =
       Platform.OS === 'ios'
         ? 'https://apps.apple.com/app/id123456789' // TODO: Update with real App Store ID later
@@ -96,6 +101,10 @@ const SettingsScreen = () => {
   };
 
   const handleLanguageChange = (lang: string) => {
+    trackEvent('language_changed', {
+      from_lang: currentLanguage,
+      to_lang: lang,
+    });
     i18n.changeLanguage(lang);
   };
 

@@ -1,5 +1,6 @@
 import { AdEventType, RewardedAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { AD_CONFIG } from '../config/adConfig';
+import { trackEvent } from './AnalyticsService';
 
 type RewardedAdStatus = {
   isReady: boolean;
@@ -104,6 +105,10 @@ class RewardedAdManager {
 
     const unsubError = ad.addAdEventListener(AdEventType.ERROR, error => {
       console.log('[AdMob] Rewarded ad error:', error);
+      trackEvent('rewarded_ad_failed', {
+        error_code: (error as any)?.code || (error as any)?.message || 'load_failed',
+        source: 'load',
+      });
       this.pendingReward = null;
       this.lastErrorValue = error;
       this.isReadyValue = false;
@@ -164,6 +169,10 @@ class RewardedAdManager {
     try {
       await ad.show();
     } catch (error) {
+      trackEvent('rewarded_ad_failed', {
+        error_code: (error as any)?.message || 'show_failed',
+        source: 'show',
+      });
       this.pendingReward = null;
       this.lastErrorValue = error instanceof Error ? error : new Error(String(error));
       this.isShowingValue = false;

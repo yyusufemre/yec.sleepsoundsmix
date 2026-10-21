@@ -449,6 +449,15 @@ const useMixerStore = create(
       // Manual user stop — cancels native hard-stop and closes popup, but leaves Sleep Flow open if active
       stopTimer: () => {
         const state = get();
+        if (state.isTimerRunning) {
+          const remainingSeconds = state.targetTimestamp
+            ? Math.max(0, Math.round((state.targetTimestamp - Date.now()) / 1000))
+            : 0;
+          trackEvent('timer_stopped', {
+            remaining_seconds: remainingSeconds,
+            initial_duration_minutes: state.timer || 0,
+          });
+        }
         if (state.intervalId) clearInterval(state.intervalId);
         if (state.activeDeadlineId) {
           NativeSoundManager.cancelHardStop(state.activeDeadlineId);
@@ -475,6 +484,9 @@ const useMixerStore = create(
       // "+10 minutes" action — cancels old native hard-stop, closes popup, keeps audio playing, starts new 10m timer
       extendTimer10Minutes: () => {
         const state = get();
+        trackEvent('timer_extended', {
+          extension_minutes: 10,
+        });
         if (state.intervalId) clearInterval(state.intervalId);
         if (state.activeDeadlineId) {
           NativeSoundManager.cancelHardStop(state.activeDeadlineId);
@@ -486,6 +498,11 @@ const useMixerStore = create(
       // Central cleanup — stops audio, resets store state completely including timer selection
       executeSleepCleanup: () => {
         const state = get();
+        if (state.isTimerRunning || state.activeDeadlineId) {
+          trackEvent('timer_completed', {
+            duration_minutes: state.timer || 0,
+          });
+        }
         if (state.intervalId) clearInterval(state.intervalId);
         if (state.activeDeadlineId) {
           NativeSoundManager.cancelHardStop(state.activeDeadlineId);
@@ -549,6 +566,11 @@ const useMixerStore = create(
 
         const duration = minutes || state.timer;
         if (duration <= 0) return;
+
+        trackEvent('timer_started', {
+          duration_minutes: duration,
+          source: state.isSleepFlowActive ? 'sleep_flow' : 'manual',
+        });
 
         const now = Date.now();
         const hardStopTimestamp = now + (duration * 60000);

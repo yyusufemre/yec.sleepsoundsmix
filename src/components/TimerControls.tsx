@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
+  Platform,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
@@ -147,6 +148,45 @@ export const TimerButton: React.FC<TimerButtonProps> = React.memo(
   ({ minutes, isActive, disabled, onPress }) => {
     const { t } = useTranslation();
     const { fontScale } = useWindowDimensions();
+    const buttonStyle = [
+      btnStyles.button,
+      {
+        minHeight: Math.max(
+          component.touchTarget,
+          44 * fontScale + spacing.lg * 2,
+        ),
+      },
+      isActive && btnStyles.buttonActive,
+      disabled && btnStyles.buttonDisabled,
+    ];
+
+    const gradientColors = isActive
+      ? ['rgba(71, 241, 133, 0.4)', 'rgba(71, 241, 133, 0.1)']
+      : ['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.05)'];
+
+    const innerContent = (
+      <>
+        <Text
+          style={[
+            btnStyles.number,
+            isActive && btnStyles.numberActive,
+            disabled && btnStyles.numberDisabled,
+          ]}
+        >
+          {minutes}
+        </Text>
+        <Text
+          style={[
+            btnStyles.label,
+            isActive && btnStyles.labelActive,
+            disabled && btnStyles.labelDisabled,
+          ]}
+        >
+          {t('timer.minutes_short')}
+        </Text>
+      </>
+    );
+
     return (
       <TouchableOpacity
         accessibilityRole="button"
@@ -157,43 +197,23 @@ export const TimerButton: React.FC<TimerButtonProps> = React.memo(
         disabled={disabled}
         activeOpacity={0.7}
       >
-        <LinearGradient
-          colors={
-            isActive
-              ? ['rgba(71, 241, 133, 0.4)', 'rgba(71, 241, 133, 0.1)']
-              : ['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.05)']
-          }
-          style={[
-            btnStyles.button,
-            {
-              minHeight: Math.max(
-                component.touchTarget,
-                44 * fontScale + spacing.lg * 2,
-              ),
-            },
-            isActive && btnStyles.buttonActive,
-            disabled && btnStyles.buttonDisabled,
-          ]}
-        >
-          <Text
-            style={[
-              btnStyles.number,
-              isActive && btnStyles.numberActive,
-              disabled && btnStyles.numberDisabled,
-            ]}
+        {Platform.OS === 'ios' ? (
+          <View style={[buttonStyle, btnStyles.overflowHidden]}>
+            <LinearGradient
+              colors={gradientColors}
+              style={StyleSheet.absoluteFill}
+              pointerEvents="none"
+            />
+            {innerContent}
+          </View>
+        ) : (
+          <LinearGradient
+            colors={gradientColors}
+            style={buttonStyle}
           >
-            {minutes}
-          </Text>
-          <Text
-            style={[
-              btnStyles.label,
-              isActive && btnStyles.labelActive,
-              disabled && btnStyles.labelDisabled,
-            ]}
-          >
-            {t('timer.minutes_short')}
-          </Text>
-        </LinearGradient>
+            {innerContent}
+          </LinearGradient>
+        )}
       </TouchableOpacity>
     );
   },
@@ -203,6 +223,9 @@ const btnStyles = StyleSheet.create({
   cell: { flex: 1, maxWidth: component.timerButtonMax },
   cellDisabled: {
     opacity: 0.35,
+  },
+  overflowHidden: {
+    overflow: 'hidden',
   },
   button: {
     width: '100%',

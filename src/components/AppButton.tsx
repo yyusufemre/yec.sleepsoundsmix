@@ -7,6 +7,7 @@ import {
   TouchableOpacityProps,
   StyleProp,
   ViewStyle,
+  Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -117,12 +118,23 @@ export default function AppButton({
       ]}
     >
       {variant === 'gradient' ? (
-        <LinearGradient
-          colors={gradientColors || colors.accent.orangeGradient}
-          style={surface}
-        >
-          {content}
-        </LinearGradient>
+        Platform.OS === 'ios' ? (
+          <View style={[surface, styles.overflowHidden]}>
+            <LinearGradient
+              colors={gradientColors || colors.accent.orangeGradient}
+              style={StyleSheet.absoluteFill}
+              pointerEvents="none"
+            />
+            {content}
+          </View>
+        ) : (
+          <LinearGradient
+            colors={gradientColors || colors.accent.orangeGradient}
+            style={surface}
+          >
+            {content}
+          </LinearGradient>
+        )
       ) : (
         <View style={[surface, { backgroundColor }]}>{content}</View>
       )}
@@ -131,6 +143,7 @@ export default function AppButton({
 }
 const styles = StyleSheet.create({
   fullWidth: { width: '100%' },
+  overflowHidden: { overflow: 'hidden' },
   surface: {
     borderRadius: radius.xl,
     paddingHorizontal: spacing.lg,

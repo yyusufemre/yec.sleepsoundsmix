@@ -22,6 +22,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { layout } from '../theme/layout';
+import { trackEvent } from '../services/AnalyticsService';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OnboardingSlide {
@@ -694,6 +695,24 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     viewAreaCoveragePercentThreshold: 60,
   }).current;
 
+  const onboardingStartTime = useRef(Date.now());
+
+  const handleComplete = useCallback(() => {
+    const timeSpent = Math.round((Date.now() - onboardingStartTime.current) / 1000);
+    trackEvent('onboarding_completed', {
+      step_count: SLIDES.length,
+      time_spent_seconds: timeSpent,
+    });
+    onComplete();
+  }, [onComplete]);
+
+  const handleSkip = useCallback(() => {
+    trackEvent('onboarding_skipped', {
+      at_step: activeIndex + 1,
+    });
+    onComplete();
+  }, [activeIndex, onComplete]);
+
   const goNext = () => {
     if (activeIndex < SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({
@@ -701,7 +720,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
         animated: true,
       });
     } else {
-      onComplete();
+      handleComplete();
     }
   };
 
@@ -743,7 +762,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
           fullWidth={false}
           variant="ghost"
           style={styles.skipBtn}
-          onPress={onComplete}
+          onPress={handleSkip}
         />
       )}
 

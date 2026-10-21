@@ -1,4 +1,5 @@
 import React
+import AVFoundation
 
 class SoundPlayerState {
   var player: AVPlayer
@@ -247,12 +248,6 @@ class NativeSoundManager: RCTEventEmitter {
 
     return data
   }
-
-  private var activeDeadlineId: String? = nil
-  private var pendingHardStopWorkItem: DispatchWorkItem? = nil
-  private var lastCompletedHardStopId: String? = nil
-  private var lastCompletedHardStopTimestamp: Double = 0
-  private var lastCompletedDidCleanup: Bool = false
 
   @objc
   func pauseAll() {
